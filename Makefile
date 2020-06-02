@@ -14,7 +14,7 @@ BOOST_LIB=-L $(BOOSTLIBDIR) -lmpc -lmpfr -lgmp
 CXXFLAGS= -Wall -std=c++17 -g -I $(BOOSTHDRDIR) $(LDFLAGS) 
 HEADERS=./quartic.hpp ./pvector.hpp ./rpoly.hpp ./cpoly.hpp
 LDFLAGS=-lm -llapack -lblas $(BOOST_LIB) 
-all: statanalysis
+all: statanalysis poly_real poly_mp poly_cmplx
 
 poly_real: poly_real.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) -o poly_real poly_real.cpp  

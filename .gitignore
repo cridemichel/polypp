@@ -11,3 +11,6 @@ accuracytests
 *swp
 *.dSYM
 *.dat
+poly_mp
+poly_cmplx
+poly_real
