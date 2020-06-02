@@ -14,7 +14,7 @@
 using namespace std;
 template <class ntype, class cmplx=complex<ntype>> 
 class quartic: public numeric_limits<ntype> {
-  static const int n=4, N=4;
+  const int n=4, N=4;
   pvector<ntype,5> coeff;
   pvector<ntype,5> cmon;
   pvector<cmplx,5> coeffc, cmonc;

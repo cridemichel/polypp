@@ -275,7 +275,7 @@ public:
               /* use aberth method */
               pvector<cmplx, -1> co(n+1);
               pvector<cmplx, -1> ro(n);
-              cpoly<cmplx,-1,ntype> pol;
+              cpoly<cmplx,-1,ntype> pol(n);
               for (int i=0; i <= n; i++)
                 co[i] = cmplx(coeff[i],0.0);
               pol.set_coeff(co);

@@ -11,7 +11,7 @@ BOOSTLIBDIR=/usr/local/lib
 BOOSTHDRDIR=/usr/local/include
 ############################################################
 BOOST_LIB=-L $(BOOSTLIBDIR) -lmpc -lmpfr -lgmp
-CXXFLAGS= -Wall -std=c++17 -O3 -I $(BOOSTHDRDIR) $(LDFLAGS) 
+CXXFLAGS= -Wall -std=c++17 -g -I $(BOOSTHDRDIR) $(LDFLAGS) 
 HEADERS=./quartic.hpp ./pvector.hpp ./rpoly.hpp ./cpoly.hpp
 LDFLAGS=-lm -llapack -lblas $(BOOST_LIB) 
 all: statanalysis

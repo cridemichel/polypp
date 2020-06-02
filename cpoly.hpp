@@ -119,6 +119,7 @@ public:
   //,rold(nc)
 #endif
   {
+    //cout << "n=" << nc << " QUI<=\n ";
     n=nc;
   }
   ~cpoly_base_dynamic() = default;

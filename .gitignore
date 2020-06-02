@@ -9,3 +9,5 @@ statanalysis
 accuracytests
 .criprojroot
 *swp
+*.dSYM
+*.dat

@@ -5,9 +5,6 @@
 #define MPC_MP
 //#define GMP_MP
 //#define CPP_MP
-#ifndef NDEG
-#define NDEG 6
-#endif
 #ifdef CPP_MP
 #include <boost/multiprecision/cpp_bin_float.hpp> 
 #include <boost/multiprecision/cpp_complex.hpp>
@@ -44,10 +41,16 @@ using cmplx=complex<vldbl>;
 using pdbl=double;
 using pcmplx=complex<pdbl>;
 #endif
-void calc_coeff(pvector<pdbl,NDEG+1>& co, pvector<cmplx,NDEG> er)
+int NDEG=6;
+void calc_coeff(pvector<pdbl,-1>& co, pvector<cmplx,-1> er)
 {
-  vldbl rr[NDEG], ir[NDEG], c[NDEG+1], alpha, beta, zero;
+  pvector<vldbl,-1> rr, ir, c;
+  vldbl alpha, beta, zero;
   int ii, jj;
+
+  rr.allocate(NDEG);
+  ir.allocate(NDEG);
+  c.allocate(NDEG+1);
   /* 
    * il seguente algoritmo per generare i coefficienti vale solo se sono reali */
   zero = 0.0;
@@ -59,7 +62,6 @@ void calc_coeff(pvector<pdbl,NDEG+1>& co, pvector<cmplx,NDEG> er)
     }
   c[NDEG]=1.0;
   ii=0;
-  
   while (ii < NDEG)
     { 
       if (ir[ii] == zero) 
@@ -97,6 +99,7 @@ void calc_coeff(pvector<pdbl,NDEG+1>& co, pvector<cmplx,NDEG> er)
           ii=ii+2;
         }
     }
+  co[NDEG] = c[NDEG];
   for (ii=0; ii < NDEG; ii++)
      co[ii] = pdbl(c[NDEG-ii-1]);
 }
@@ -104,13 +107,17 @@ double ranf(void)
 {
   return drand48();
 }
-void sort_sol_opt(pvector<pcmplx,NDEG>& csol, pvector<cmplx,NDEG>& exsol, vldbl allrelerr[])
+void sort_sol_opt(pvector<pcmplx,-1>& csol, pvector<cmplx,-1>& exsol, vldbl allrelerr[])
 {
   int k1, k2, k2min;
-  int perm[NDEG];
+  int *perm;
   vldbl relerr, relerrmin;
-  cmplx diff, solt[NDEG];
-  bool used_exsol[NDEG];
+  cmplx diff, *solt;
+  bool *used_exsol;
+
+  perm = new int[NDEG];
+  solt = new cmplx[NDEG];
+  used_exsol = new bool[NDEG];
   for (k1=0; k1 < NDEG; k1++)
     used_exsol[k1]=false;
   for (k1=0; k1 < NDEG; k1++)
@@ -140,12 +147,16 @@ void sort_sol_opt(pvector<pcmplx,NDEG>& csol, pvector<cmplx,NDEG>& exsol, vldbl 
 
   for (k1=0; k1 < NDEG; k1++)
     csol[perm[k1]] = pcmplx(solt[k1]);
+  delete [] perm;
+  delete [] used_exsol;
+  delete [] solt;
+  
 }
 #define MAXSOLV 10
 #define PEPTS 500
-int cmplxreal=0, restart, dojust=-1;
+int cmplxreal=0, restart;
 double cumPEall[PEPTS], PEall[PEPTS];
-pvector<pcmplx,NDEG> csolall;
+pvector<pcmplx,-1> csolall;
 char fname[256];
 void save_PE(long long int numtrials, int numpts, vldbl dlogdE, vldbl logdEmin)
 {
@@ -179,23 +190,22 @@ void save_PE(long long int numtrials, int numpts, vldbl dlogdE, vldbl logdEmin)
   fclose(f);
 }
 
-vldbl allrelerr[NDEG];
+vldbl *allrelerr;
 int main(int argc, char **argv)
 {
   pdbl  sig, sig2, x1, y1;
   vldbl logdE, dlogdE, logdEmax, logdEmin;
   vldbl dE;
-  pvector<cmplx,NDEG> exsol;
-  pvector<pcmplx,NDEG> csol;
-  pvector<pdbl,NDEG+1> co;
+  pvector<cmplx,-1> exsol;
+  pvector<pcmplx,-1> csol;
+  pvector<pdbl,-1> co;
   long long int numtrials, its=0, numout, itsI;
   int numpts, ilogdE;
   int k, i;
   pvector<pcmplx,-1> csold(NDEG);
   pvector<pdbl,-1> cod(NDEG+1);
-  rpoly<pdbl,-1,pcmplx> oqs(NDEG);
+  rpoly<pdbl,-1,pcmplx> oqs;
   srand48(4242);
-  
   for (k=0; k < PEPTS; k++)
     PEall[k] = 0;
 
@@ -219,6 +229,15 @@ int main(int argc, char **argv)
     numout=100;
   if (argc>=4)
     cmplxreal = atoi(argv[3]);
+  if (argc >= 5)
+    NDEG=atoi(argv[4]);
+
+  co.allocate(NDEG+1);
+  csol.allocate(NDEG);
+  exsol.allocate(NDEG);
+  oqs.allocate(NDEG);
+  csolall.allocate(NDEG);
+  allrelerr = new vldbl[NDEG];
   if (cmplxreal < 0 || cmplxreal > 5)
     {
       printf("cmplxreal must be between 0 and 5!\n");
@@ -243,8 +262,8 @@ int main(int argc, char **argv)
     }
   else
     {
-      printf("numtrials=%lld numout=%lld cmplxreal=%d dojust=%d\n", 
-	     numtrials, numout, cmplxreal, dojust);
+      printf("numtrials=%lld numout=%lld cmplxreal=%d degree=%d\n", 
+	     numtrials, numout, cmplxreal, NDEG);
     }
   //oqs.set_output_prec(1E-40);
   for (its=itsI; its < numtrials; its++)
@@ -304,7 +323,7 @@ int main(int argc, char **argv)
 	}
       if (cmplxreal == 5)
 	{
-	  co[5]=1.0;
+	  co[NDEG]=1.0;
           for (i=0; i < NDEG; i++)
             co[i]= ranf()-0.5;
 	}
@@ -312,11 +331,11 @@ int main(int argc, char **argv)
 	{
           calc_coeff(co, exsol);
         }
-      cout << "QUI\n";
       
       for (i=0; i <= NDEG; i++)
         cod[i] = co[i];
       oqs.set_coeff(cod);
+      //cout << "QUI\n";
       oqs.find_roots(csold);
       for (i=0; i < NDEG; i++)
         csolall[i] = csold[i];
@@ -345,5 +364,6 @@ int main(int argc, char **argv)
     }
   save_PE(numtrials, numpts, dlogdE, logdEmin);
   printf("Finished\n");
+  delete [] allrelerr;
   exit(0);
 }
