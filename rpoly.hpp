@@ -30,6 +30,12 @@ public:
   void set_coeff(pvector<ntype,N+1> v)
     {
       coeff = v;
+      cmon[n]=1.0;
+      for (int i=n-1; i >=0; i--)
+        {
+          cmon[i]=coeff[i]/coeff[n];
+        }
+
     }
   rpoly_base_static()
     {
@@ -53,6 +59,12 @@ public:
   void set_coeff(pvector<ntype,-1> v)
     {
       coeff = v;
+      cmon[n]=1.0;
+      for (int i=n-1; i >=0; i--)
+        {
+          cmon[i]=coeff[i]/coeff[n];
+        }
+
     }
 
   void use_vec(int nc, ntype* coeffv, ntype* cmonv)

@@ -56,6 +56,5 @@ int main(void)
       cout << setprecision(WP) << "p(#" << cc << ")=" << P.evalpoly(r0) << "\n\n";
       cc++;
     }
-  cout << "p=" << P.evalpoly(mpcmplx(1.0)) << "\n";
   return 0;
 }

@@ -40,9 +40,11 @@ int main(void)
   pvector<mpreal,NDEG+1> c;
   pvector<mpcmplx,NDEG> r;
 
+  for (int i=0; i <= NDEG; i++)
+    c[i] = mpreal("1.0");
   P.set_coeff(c);
   P.find_roots(r);
-  r.show("roots");
+  //r.show("roots");
   int cc=0;
   for (auto& r0: r)
     {
