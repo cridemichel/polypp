@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include "./rpoly.hpp"
 #include <complex>
+#define WP 100
 #define MPC_MP
 //#define GMP_MP
 //#define CPP_MP
@@ -11,8 +12,8 @@
 using namespace boost;
 using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
-using vldbl = number<cpp_bin_float<100>>;
-using cmplx = cpp_complex<100>;
+using vldbl = number<cpp_bin_float<WP>>;
+using cmplx = cpp_complex<WP>;
 using pdbl=vldbl;
 using pcmplx=cmplx;
 #elif defined(GMP_MP)
@@ -21,8 +22,8 @@ using pcmplx=cmplx;
 using namespace boost;
 using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
-using vldbl=number<gmp_float<100>>;
-using cmplx=number<complex_adaptor<gmp_float<100>>>;
+using vldbl=number<gmp_float<WP>>;
+using cmplx=number<complex_adaptor<gmp_float<WP>>>;
 using pdbl=vldbl;
 using pcmplx=cmplx;
 #elif defined(MPC_MP)
@@ -31,8 +32,8 @@ using pcmplx=cmplx;
 using namespace boost;
 using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
-using vldbl=number<mpfr_float_backend<100>>;
-using cmplx=number<mpc_complex_backend<100>>;
+using vldbl=number<mpfr_float_backend<WP>>;
+using cmplx=number<mpc_complex_backend<WP>>;
 using pdbl=vldbl;
 using pcmplx=cmplx;
 #else
@@ -238,9 +239,9 @@ int main(int argc, char **argv)
   oqs.allocate(NDEG);
   csolall.allocate(NDEG);
   allrelerr = new vldbl[NDEG];
-  if (cmplxreal < 0 || cmplxreal > 5)
+  if (cmplxreal < 0 || cmplxreal > 4)
     {
-      printf("cmplxreal must be between 0 and 5!\n");
+      printf("cmplxreal must be between 0 and 4!\n");
       exit(-1);
     }
   if (cmplxreal==3)
@@ -280,9 +281,11 @@ int main(int argc, char **argv)
 	    printf("[SAMPLE D sig=%G %G]>>> its=%lld/%lld\n", double(sig), double(sig2), its, numtrials);
 	  else if (cmplxreal==4)
             printf("[SAMPLE E sig=%G %G]>>> its=%lld/%lld\n", double(sig), double(sig2), its, numtrials);
+#if 0
           else if (cmplxreal==5)
             printf("[SAMPLE F sig=%G %G]>>> its=%lld/%lld\n", double(sig), double(sig2), its, numtrials);
-	  save_PE(its, numpts, dlogdE, logdEmin);
+#endif
+          save_PE(its, numpts, dlogdE, logdEmin);
 	}
       /* generate 4 random roots */
       if (cmplxreal==2) /* all complex */
@@ -301,14 +304,12 @@ int main(int argc, char **argv)
         }
       else if (cmplxreal==1) /* half complex half real */
 	{
-          
-
           for (i=0; i < NDEG/2; i=i+2)
             { 
               x1 = sig2*(ranf()-0.5);
               y1 = sig2*(ranf()-0.5);
-              exsol[i] = cmplx(x1,2.0*y1);
-              exsol[i+1] = cmplx(x1,-0.2*y1);
+              exsol[i] = cmplx(x1,y1);
+              exsol[i+1] = cmplx(x1,-y1);
             }
 
           for (; i < NDEG; i++)
@@ -321,16 +322,7 @@ int main(int argc, char **argv)
           for (i=0; i < NDEG; i++)
             exsol[i] = cmplx(sig*(ranf()-0.5),0.0);
 	}
-      if (cmplxreal == 5)
-	{
-	  co[NDEG]=1.0;
-          for (i=0; i < NDEG; i++)
-            co[i]= ranf()-0.5;
-	}
-      else
-	{
-          calc_coeff(co, exsol);
-        }
+      calc_coeff(co, exsol);
       
       for (i=0; i <= NDEG; i++)
         cod[i] = co[i];

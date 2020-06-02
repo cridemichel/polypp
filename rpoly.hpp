@@ -281,7 +281,7 @@ public:
               pol.set_coeff(co);
               pol.find_roots(ro);
               for (int i=0; i < n; i++)
-                roots[i] = ro[i].real();
+                roots[i] = ro[i];
 
             }
         }
@@ -315,7 +315,7 @@ public:
               pol.set_coeff(co);
               pol.find_roots(ro);
               for (int i=0; i < N; i++)
-                roots[i] = ro[i].real();
+                roots[i] = ro[i];
             }
         }
     }
