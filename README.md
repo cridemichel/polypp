@@ -8,7 +8,7 @@ Roots of polynomials of higher degree are found by using Aberth algorithm as dis
 Stopping criterion and accurate calculation of correction term in Aberth method 
 have been implemented as suggested in [6].
 
-References
+**References**
 
 [1] W. H. Press, S. A. Teukolsky, W. T. Vetterling, and B. P. Flannery. 2007. Numerical Recipes - The Art of Scientific
     Computing (3rd ed.). Cambridge University Press, Cambridge, UK.\
