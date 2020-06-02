@@ -39,7 +39,7 @@ you obtain the following executables:
 
 **poly_cmplx**: example of usage of cpoly.hpp to find the roots of complex polynomials in  multiple precision (using boost).
 
-**statanalysis**: it performs some statistical analyses inspired by the ones which can be found in Ref. [1]. 
+**statanalysis**: it performs some statistical analyses inspired by the ones which can be found in Ref. [2]. 
 The syntax is the following (where '>' is the shell prompt string):
 
 ```bash
@@ -55,7 +55,7 @@ where:
 	in the file named F_of_eps_rel.dat. 
 
 *sample*: it is an integer between 0 and 4 which specifies the sample to generate 
-	(see Table 4 with 0={sample A}, 1={sample B}, 2={sample C}, 3={sample D}, 4={sample E} and
+	(see Table 4 in Ref. [2] with 0={sample A}, 1={sample B}, 2={sample C}, 3={sample D}, 4={sample E} and
 	5={sample F}).
 
 *degree*: degree of the polynomials.
