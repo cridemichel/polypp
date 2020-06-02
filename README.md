@@ -55,7 +55,7 @@ where:
 	in the file named F_of_eps_rel.dat. 
 
 *sample*: it is an integer between 0 and 4 which specifies the sample to generate 
-	(see Table 4 in Ref. [2] with 0={sample A}, 1={sample B}, 2={sample C}, 3={sample D}, 4={sample E} and
+	(cf. Table 4 in Ref. [2] with 0={sample A}, 1={sample B}, 2={sample C}, 3={sample D}, 4={sample E} and
 	5={sample F}).
 
 *degree*: degree of the polynomials.
