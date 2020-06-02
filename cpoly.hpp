@@ -7,7 +7,7 @@
  * Aberth method can be parallelized without issues
  
 *
- * stopping criterion and accurate calculation of correction term in Abrth method have implemented as suggested in [4]
+ * stopping criterion and accurate calculation of correction term in Abrth method have been implemented as suggested in [4]
  * By using the method set_polish(true), polishing by maehly's method is enabled (by default is disabled since it is slower)
  *
  *
