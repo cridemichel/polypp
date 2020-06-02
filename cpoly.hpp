@@ -325,8 +325,11 @@ public:
       cmplx p1pc;
       const ntype EPS=goaleps;
       // root polishing by NR
-      ntype tt[2], pa[2], xcR, xcI, aR, aI, sump[2], p1p[2];
-      ntype absp, abx, p10, p0, x[2], s, p[2], p1[2], pp1[2], dx[2], invden, sum[2];
+      ntype tt[2], xcR, xcI, aR, aI, p1p[2];
+#ifdef BINI_CONV_CRIT
+      ntype pa[2], s;
+#endif
+      ntype absp, abx, p10, p0, x[2], p[2], p1[2], dx[2], invden;
       //cout << "xc=" << xc << "\n";
       xcR=real(r0);
       xcI=imag(r0);
@@ -406,8 +409,11 @@ public:
       cmplx p1pc;
       const ntype EPS=goaleps;
       // root polishing by NR
-      ntype aR, aI, sump[2], p1p[2];
-      ntype absp, abx, p10, p0, x[2], s, p[2], p1[2], pp1[2], dx[2], invden, sum[2];
+      ntype aR, aI, p1p[2];
+      ntype absp, abx, p10, p0, x[2], p[2], p1[2], dx[2], invden;
+#ifdef BINI_CONV_CRIT
+      ntype s;
+#endif
       x[0] = r0.real();
       x[1] = r0.imag();
      //its=iter;
@@ -473,7 +479,9 @@ public:
   bool nr_aberth_cmplx(cmplx &r0, pvector<cmplx,N> &roots, int iac)
     {
       int i;
-      cmplx povp1, denom;
+#ifdef POLISH_NR_REAL
+      cmplx povp1;
+#endif
       const ntype EPS=goaleps;
       // root polishing by NR
       cmplx p, p1, p1p;
@@ -531,7 +539,6 @@ public:
   bool nr_aberth_cmplx_rev(cmplx &r0, pvector<cmplx,N> &roots, int iac)
     {
       int i;
-      cmplx povp1, denom;
       const ntype EPS=goaleps;
       // root polishing by NR
       cmplx pa, p, p1, p1p, x;
@@ -592,11 +599,12 @@ public:
     {
       int iter,i;
       ntype err;
-      cmplx povp1, denom;
+#ifdef POLISH_NR_REAL
+      cmplx povp1;
+#endif
       // root polishing by NR
       cmplx r0old, p, sum;
       cmplx p1, p1c;
-      ntype b[2], d[2], d0, b0, x[2];
       ntype errold;
       for (iter=0; ; iter++)
         {
@@ -920,7 +928,10 @@ public:
 #endif
       vector<cmplx> rg;
       vector<int> k;
-      ntype sigma, ukc, vkc, maxt, t;
+      ntype sigma;
+#ifndef USE_CONVEX_HULL
+      ntype ukc, vkc, maxt, t;
+#endif
       Point p;
       int q, i, j;
 #ifdef USE_CONVEX_HULL
@@ -1050,7 +1061,7 @@ public:
         }
     }
 
-  void laguerre_aberth(pvector<cmplx,N>& roots, bool polish=false, bool try_harder=true, int method=0)//0 is laguerre; 1=aberth (faster)
+  void aberth(pvector<cmplx,N>& roots, bool polish=false)
     {
       bool *found = new bool[n], ret;
 #ifdef _OPENMP
@@ -1231,7 +1242,7 @@ public:
        * (see sec. 2.2 in the manuscript) */ 
       cmplx a,b,c;
       cmplx K, Q, R, Q3, R2, A, B, Ap, Am, ApB, AmB;
-      ntype theta, Q3r, R2r, sqrtQr, Ar, Br;
+      ntype theta, Q3r, R2r, Ar, Br;
       const ntype sqrt3=sqrt(ntype(3.0))/ntype(2.0);
       a = coeff[2]/coeff[3];
       b = coeff[1]/coeff[3];
@@ -1308,7 +1319,7 @@ public:
         }
       else
         {
-          aberth(roots, gpolish, true, 1);
+          aberth(roots, gpolish);
         }
     }
 

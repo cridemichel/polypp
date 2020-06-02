@@ -12,24 +12,21 @@ BOOSTHDRDIR=/usr/local/include
 ############################################################
 BOOST_LIB=-L $(BOOSTLIBDIR) -lmpc -lmpfr -lgmp
 CXXFLAGS= -Wall -std=c++17 -O3 -I $(BOOSTHDRDIR) $(LDFLAGS) 
-HEADERS=./quartic.hpp ./pvector.hpp 
+HEADERS=./quartic.hpp ./pvector.hpp ./rpoly.hpp ./cpoly.hpp
 LDFLAGS=-lm -llapack -lblas $(BOOST_LIB) 
-all: quartic quartic_mp quartic_cmplx accuracytest statanalysis
+all: statanalysis
 
-quartic: quartic.cpp $(HEADERS)
-	$(CXX) $(CXXFLAGS) -o quartic quartic.cpp  
+poly_real: poly_real.cpp $(HEADERS)
+	$(CXX) $(CXXFLAGS) -o poly_real poly_real.cpp  
 
-quartic_mp: quartic_mp.cpp $(HEADERS) 
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o quartic_mp quartic_mp.cpp  
+poly_cmplx: poly_cmplx.cpp $(HEADERS) 
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o poly_cmplx poly_cmplx.cpp  
 
-quartic_cmplx: quartic_cmplx.cpp $(HEADERS) 
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o quartic_cmplx quartic_cmplx.cpp  
-
-accuracytest: accuracytest.cpp $(HEADERS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o accuracytest accuracytest.cpp  
+poly_mp: poly_mp.cpp $(HEADERS) 
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o poly_mp poly_mp.cpp  
 
 statanalysis: statanalysis.cpp $(HEADERS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o statanalysis statanalysis.cpp  
 
 clean:
-	rm -f quartic quartic_mp quartic_cmplx accuracytest statanalysis *.o
+	rm -f poly_real poly_cmplx poly_mp statanalysis *.o

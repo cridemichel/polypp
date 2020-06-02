@@ -1,4 +1,11 @@
+tags
+GPATH
+GTAGS
+GRTAGS
+.viminfo
+compile_commands.json
 Session.vim
 statanalysis
 accuracytests
+.criprojroot
 *swp

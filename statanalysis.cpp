@@ -145,31 +145,19 @@ void sort_sol_opt(pvector<pcmplx,NDEG>& csol, pvector<cmplx,NDEG>& exsol, vldbl 
 #define PEPTS 500
 int cmplxreal=0, restart, dojust=-1;
 double cumPEall[PEPTS], PEall[PEPTS];
-pvector<pcmplx,NDEG> csolall[MAXSOLV];
-void print_legend(FILE *f)
-{
-  int ic;
-  if (dojust < 0)
-    {
-      for (ic=0; ic < 2; ic++)
-	fprintf(f,"@    s%d legend \"%s\"\n", ic, ic2algo(ic));
-    }
-  else
-    fprintf(f,"@    s%d legend \"%s\"\n", dojust, ic2algo(dojust));
-}
-int maxic=3, icref;
+pvector<pcmplx,NDEG> csolall;
 char fname[256];
 void save_PE(long long int numtrials, int numpts, vldbl dlogdE, vldbl logdEmin)
 {
   FILE *f;
-  int k, kk, ic;
+  int k, kk;
   sprintf(fname,"PE.dat");
   f = fopen(fname, "w+");
   for (k=0; k < numpts; k++)
     {
-      if (PEall[ic][k]==0) 
+      if (PEall[k]==0) 
         continue;
-      fprintf(f, "%.32G %.32G\n", double(vldbl(k)*dlogdE+logdEmin), double(PEall[ic][k]/((double)numtrials)/double(NDEG)));
+      fprintf(f, "%.32G %.32G\n", double(vldbl(k)*dlogdE+logdEmin), double(PEall[k]/((double)numtrials)/double(NDEG)));
     }
   fclose(f);
   for (k=0; k < numpts; k++)
@@ -180,21 +168,15 @@ void save_PE(long long int numtrials, int numpts, vldbl dlogdE, vldbl logdEmin)
           cumPEall[k] += PEall[kk]/((double)numtrials)/((double)NDEG);
         }
     }
-  for (ic=0; ic < maxic; ic++)
+  sprintf(fname,"cumPE.dat");
+  f = fopen(fname, "w+");
+  for (k=0; k < numpts; k++)
     {
-      if (dojust >= 0 && ic != dojust)
-	continue;
-      
-      sprintf(fname,"cumPE-%s.dat", ic2algo(ic));
-      f = fopen(fname, "w+");
-      for (k=0; k < numpts; k++)
-	{
-	  if (cumPEall[ic][k]==0)
-	    continue;
-	  fprintf(f, "%.32G %.32G\n", double(k*dlogdE+logdEmin), double(cumPEall[ic][k]));
-	}
-      fclose(f);
+      if (cumPEall[k]==0)
+        continue;
+      fprintf(f, "%.32G %.32G\n", double(k*dlogdE+logdEmin), double(cumPEall[k]));
     }
+  fclose(f);
 }
 
 vldbl allrelerr[NDEG];
@@ -254,13 +236,6 @@ int main(int argc, char **argv)
       sig2 = 1E6;
       cmplxreal = 2;
     } 
-  if (argc  >= 5)
-    dojust=atoi(argv[4]);
-  if (dojust > 2)
-    {
-      printf("which test should I have to perform?!?\n Last arg is too big!\n");
-      exit(-1);
-    }
   if (numtrials < 0)
     {
       printf("number of trials must be a positive integer!\n");
@@ -337,19 +312,18 @@ int main(int argc, char **argv)
 	{
           calc_coeff(co, exsol);
         }
-
+      cout << "QUI\n";
       
       for (i=0; i <= NDEG; i++)
         cod[i] = co[i];
       oqs.set_coeff(cod);
-      oqs.set_polish(false);
       oqs.find_roots(csold);
       for (i=0; i < NDEG; i++)
         csolall[i] = csold[i];
       sort_sol_opt(csolall, exsol, allrelerr);
       for (k=0; k < NDEG; k++)
         {	
-          dE = allrelerr[ic][k]; 
+          dE = allrelerr[k]; 
           if (dE > 0.0)
             {
               logdE=log10(dE)-logdEmin;
