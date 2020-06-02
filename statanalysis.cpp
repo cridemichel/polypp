@@ -52,8 +52,6 @@ void calc_coeff(pvector<pdbl,-1>& co, pvector<cmplx,-1> er)
   rr.allocate(NDEG);
   ir.allocate(NDEG);
   c.allocate(NDEG+1);
-  /* 
-   * il seguente algoritmo per generare i coefficienti vale solo se sono reali */
   zero = 0.0;
   for (ii=0; ii < NDEG; ii++)
     {
@@ -70,7 +68,6 @@ void calc_coeff(pvector<pdbl,-1>& co, pvector<cmplx,-1> er)
           alpha = -rr[ii];
           for (jj=ii; jj >= 0; jj--)
             {         
-              //do jj=ii,1,-1
               if (jj==0)
                 c[jj] = c[jj] + alpha;
               else
@@ -84,8 +81,6 @@ void calc_coeff(pvector<pdbl,-1>& co, pvector<cmplx,-1> er)
           beta = rr[ii]*rr[ii] + ir[ii]*ir[ii];
           for (jj=ii+1; jj >= 0; jj--)
             { 
-              //cout << "jj=" << jj << "\n";
-              //do jj=ii+1,1,-1
               if (jj == 1)
                 {
                   c[jj] = c[jj] + alpha*c[jj-1] + beta;
