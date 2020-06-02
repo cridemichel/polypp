@@ -11,8 +11,8 @@ have been implemented as suggested in [6].
 **References**
 
 ```bibliography
-[1] W. H. Press, S. A. Teukolsky, W. T. Vetterling, and B. P. Flannery. 2007. Numerical Recipes - The Art of Scientific
-    Computing (3rd ed.). Cambridge University Press, Cambridge, UK.
+[1] W. H. Press, S. A. Teukolsky, W. T. Vetterling, and B. P. Flannery, Numerical Recipes - The Art of Scientific
+    Computing (3rd ed.), Cambridge University Press, Cambridge, UK (2007).
 [2] A. G. Orellana and C. De Michele, ACM Transactions on Mathematical Software, 46, No. 2, Article 20 (2020),
     doi: https://doi.org/10.1145/3386241.
 [3] D. A. Bini, Numerical Algorithms 13, 179-200 (1996).
