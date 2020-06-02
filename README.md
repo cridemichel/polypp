@@ -1,4 +1,5 @@
-***polypp***
+**polypp**
+===========
 
 C++ class for solving complex and real polynomials of any degree in multiprecision.
 Quadratic and cubic solver are based on Numerical Recipe book [1].
