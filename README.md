@@ -9,15 +9,15 @@ Stopping criterion and accurate calculation of correction term in Aberth method
 have been implemented as suggested in [6].
 
 References
-```text
+
 [1] W. H. Press, S. A. Teukolsky, W. T. Vetterling, and B. P. Flannery. 2007. Numerical Recipes - The Art of Scientific
-Computing (3rd ed.). Cambridge University Press, Cambridge, UK.
+Computing (3rd ed.). Cambridge University Press, Cambridge, UK.\
 [2] A. G. Orellana and C. De Michele, ACM Transactions on Mathematical Software, 46, No. 2, Article 20 (2020), doi: https://doi.org/10.1145/3386241.
 [3] D. A. Bini, Numerical Algorithms 13, 179-200 (1996).
 [4] D. A. Bini and G. Fiorentino, Numerical Algorithms 23, 127–173 (2000).
 [5] D. A. Bini et al. Numerical Algorithms 34, 217–227 (2003). 
 [6] T. R. Cameron, Numerical Algorithms, 82, 1065–1084 (2019), doi: https://doi.org/10.1007/s11075-018-0641-9 
-```
+
 In addition to header files you will find some .cpp files with examples on how to use this class.
 Multiprecision is implemented through boost multiprecision libraries (https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/index.html).
 Before compiling change the directories related to boost in the Makefile (BOOSTLIBDIR and BOOSTHDRDIR).
