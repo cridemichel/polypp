@@ -1,6 +1,6 @@
 #include<stdlib.h>
 #include<stdio.h>
-//#define CPOLY
+#define CPOLY
 #ifdef CPOLY
 #include "./cpoly.hpp"
 #else
@@ -110,7 +110,7 @@ double ranf(void)
 }
 void sort_sol_opt(pvector<pcmplx,-1>& csol, pvector<cmplx,-1>& exsol, vldbl allrelerr[])
 {
-  int k1, k2, k2min;
+  int k1, k2, k2min=0;
   int *perm;
   vldbl relerr, relerrmin;
   cmplx diff, *solt;

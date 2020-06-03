@@ -57,6 +57,8 @@ public:
   pvector<cmplx, N+1> cmon;
   pvector<cmplx, N-1> abscmon;
   pvector<ntype, N+1> alpha;
+  quartic<ntype,cmplx,false> quar;
+
 
 #ifdef USE_ROLD
   pvector<cmplx, N> rold;
@@ -105,6 +107,7 @@ public:
   pvector<cmplx> rold;
 #endif
   pvector<dcmplx> droots;
+  quartic<ntype,cmplx,true> quar;
 
   cpoly_base_dynamic() = default;
 
@@ -185,6 +188,7 @@ class cpoly: public numeric_limits<ntype>, public cpolybase<cmplx,ntype,dcmplx,N
   using cpolybase<cmplx,ntype,dcmplx,N>::acmon;
   using cpolybase<cmplx,ntype,dcmplx,N>::alpha;
   using cpolybase<cmplx,ntype,dcmplx,N>::droots;
+  using cpolybase<cmplx,ntype,dcmplx,N>::quar;
 
   const ntype pigr=acos(ntype(-1.0));
   const cmplx I = cmplx(0.0,1.0);
@@ -1062,7 +1066,7 @@ public:
               cpoly<dcmplx,N,dntype,dcmplx,dntype> drs;
               if constexpr (N < 0)
                 drs.allocate(n);
-              drs.use_iniguess();
+              drs.iniguess_slow();
               drs.set_coeff(dcoeff);
               drs.find_roots(droots);
               for (i=0; i < n; i++)
@@ -1247,14 +1251,8 @@ public:
         }
       else if (n==4)
         {
-          quartic<ntype,cmplx> Q;
-          pvector<cmplx,5> c;
-          pvector<cmplx,4> r;
-          c << coeff[0], coeff[1], coeff[2], coeff[3], coeff[4];
-          Q.set_coeff(c);
-          Q.find_roots(r);
-          for (int i=0; i < 4; i++)
-            roots[i] = r[i];
+          quar.set_coeff(coeff);
+          quar.find_roots(roots);
         }
       else
         {
@@ -1262,7 +1260,6 @@ public:
         }
     }
 
-  
   // get machine precision for "ntype" type (ntype can float, double, long double)
   ntype epsilon()
     {
@@ -1280,11 +1277,11 @@ public:
     {
       return goaleps;
     } 
-  void use_iniguess(void)
+  void iniguess_slow(void)
     {
       use_dbl_iniguess=false;
     }
-  void no_iniguess(void)
+  void iniguess_fast(void)
     {
       use_dbl_iniguess=true;
     }
@@ -1311,7 +1308,7 @@ public:
       Kconv=3.8;
       gpolish=false;
       guess_provided=false;
-      use_dbl_iniguess=false;
+      use_dbl_iniguess=true; // calculate initial guess using double precision (much faster!)
     }
   cpoly()
     {

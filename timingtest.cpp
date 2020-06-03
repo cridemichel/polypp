@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-//#define CPOLY
+#define CPOLY
 //#define STATIC
 #ifdef CPOLY
 #include "./cpoly.hpp"
@@ -52,7 +52,7 @@ using cmplx=complex<numty>;
 
 //#include<complex>
 #ifndef NDEG
-#define NDEG 50
+#define NDEG 10
 #endif
 
 double gauss(void)

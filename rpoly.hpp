@@ -160,10 +160,20 @@ public:
       show(NULL);
     }
 
+  void iniguess_slow(void)
+    {
+      cpol.iniguess_slow();
+    }
+  void iniguess_fast(void)
+    {
+      cpol.iniguess_fast();
+    }
+
   void set_show_digits(int p)
     {
       maxdigits=p;
     }
+
   void show(const char* str)
     {
       int i;
