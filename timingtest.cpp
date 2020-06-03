@@ -242,7 +242,9 @@ int main(int argc, char* argv[])
   pvector<cmplx,-1> roots(NDEG);
 #endif
 #endif
-
+#ifdef _OPENMP
+  cout << "# thread=" << omp_get_max_threads() << "\n";
+#endif
   srand48(time(0));
   numty sig=1.0;
   if (argc>=2)

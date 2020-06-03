@@ -1,3 +1,5 @@
+#ifndef _CPOLY_
+#define _CPOLY_
 /* 
  * NOTES:
  *
@@ -39,7 +41,7 @@
 //#define BINI_CONV_CRIT // Bini stopping criterion is slightly less accurate and slightly slower than Cameron one.
 #define USE_CONVEX_HULL // <---- faster
 #define USE_ABERTH_REAL //<--- faster
-#if defined(_OPENMP) // uncommenting this openmp support (multithread calculation) is enabled for aberth method
+#if defined(_OPENMP)
 #define USE_ROLD
 #endif
 using namespace std;
@@ -138,7 +140,7 @@ public:
 
   cpoly_base_dynamic(int nc): coeff(nc+1), cmon(nc+1), acmon(nc+1), alpha(nc+1), droots(nc)
 #ifdef USE_ROLD
-  //,rold(nc)
+  //  ,rold(nc)
 #endif
   {
     //cout << "n=" << nc << " QUI<=\n ";
@@ -1099,7 +1101,8 @@ public:
       ntype r;
       cmplx cn;
 #ifdef USE_ROLD
-      rold.allocate(n);
+      if constexpr (N < 0)
+        rold.allocate(n);
 #endif
       if (coeff[n]==cmplx(0.0,0.0))
         {
@@ -1233,8 +1236,7 @@ public:
         }
       if (nf < n)
         {
-          if (nf < n)
-            cout << "Found " << nf << " roots out of " << n << "\n";
+          cout << "Found " << nf << " roots out of " << n << "\n";
         }
 
       // refine 
@@ -1245,6 +1247,10 @@ public:
         }
       n=nold;
       delete []found;
+#ifdef ROLD
+      if constexpr (N < 0)
+        rold.deallocate();
+#endif
     }
    
 
@@ -1409,4 +1415,4 @@ public:
     init_const();
   }
 };
-
+#endif
