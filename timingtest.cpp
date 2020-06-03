@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#define CPOLY
+//#define CPOLY
 //#define STATIC
 #ifdef CPOLY
 #include "./cpoly.hpp"

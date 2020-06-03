@@ -179,7 +179,7 @@ template <class cmplx, class ntype, class dcmplx, int N> using cpolybase =
 typename std::conditional<(N>0), cpoly_base_static <cmplx, ntype, dcmplx, N>,
          cpoly_base_dynamic <cmplx, ntype, dcmplx, N>>::type;
 
-template <class cmplx, int N=-1, class ntype=double, class dcmplx=complex<double>, class dntype=double> 
+template <class cmplx, int N=-1, class ntype=double, class dcmplx=complex<long double>, class dntype=long double> 
 class cpoly: public numeric_limits<ntype>, public cpolybase<cmplx,ntype,dcmplx,N> 
 {
   using cpolybase<cmplx,ntype,dcmplx,N>::n;
