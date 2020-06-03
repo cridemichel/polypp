@@ -1,13 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
-#define CPOLY
+//#define CPOLY
 //#define STATIC
 #ifdef CPOLY
 #include "./cpoly.hpp"
 #else
 #include "./rpoly.hpp"
 #endif
-#define WP 100
+#define WP 200
 #define WPBS 200
 #define MPC_MP
 #ifdef CPP_MP

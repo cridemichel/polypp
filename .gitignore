@@ -14,3 +14,4 @@ accuracytests
 poly_mp
 poly_cmplx
 poly_real
+.clangd*
