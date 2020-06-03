@@ -7,7 +7,7 @@
 #else
 #include "./rpoly.hpp"
 #endif
-#define WP 200
+#define WP 60
 #define WPBS 200
 #define MPC_MP
 #ifdef CPP_MP
