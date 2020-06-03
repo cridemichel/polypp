@@ -36,9 +36,9 @@
 #include<omp.h>
 #endif
 #define Sqr(x) ((x)*(x))
-//#define BINI_CONV_CRIT
-#define USE_CONVEX_HULL 
-#define USE_ABERTH_REAL //<--- much faster
+//#define BINI_CONV_CRIT // Bini stopping criterion is slightly less accurate and slightly slower than Cameron one.
+#define USE_CONVEX_HULL // <---- faster
+#define USE_ABERTH_REAL //<--- faster
 #if defined(_OPENMP) // uncommenting this openmp support (multithread calculation) is enabled for aberth method
 #define USE_ROLD
 #endif
@@ -60,7 +60,17 @@ public:
   pvector<cmplx, N> rold;
 #endif
   pvector<dcmplx,N> droots;
-
+  void set_coeff(pvector<ntype,N+1> v)
+    {
+      for (int i=0; i <= N; i++)
+        coeff[i] = cmplx(v[i],0.0);
+      cmon[n]=1.0;
+      for (int i=n-1; i >=0; i--)
+        {
+          cmon[i]=coeff[i]/coeff[n];
+        }
+    }
+ 
   void set_coeff(pvector<cmplx,N+1> v)
     {
       coeff = v;
@@ -95,6 +105,18 @@ public:
   pvector<dcmplx> droots;
 
   cpoly_base_dynamic() = default;
+
+  void set_coeff(pvector<ntype,-1> v)
+    {
+      for (int i=0; i <= n; i++)
+        coeff[i] = cmplx(v[i],0.0);
+      cmon[n]=1.0;
+      for (int i=n-1; i >=0; i--)
+        {
+          cmon[i]=coeff[i]/coeff[n];
+        }
+    }
+
   void set_coeff(pvector<cmplx,-1> v)
     {
       coeff = v;
@@ -329,8 +351,10 @@ public:
       ntype tt[2], xcR, xcI, aR, aI, p1p[2];
 #ifdef BINI_CONV_CRIT
       ntype pa[2], s;
+#else
+      ntype absp;
 #endif
-      ntype absp, abx, p10, p0, x[2], p[2], p1[2], dx[2], invden;
+      ntype abx, p10, p0, x[2], p[2], p1[2], dx[2], invden;
       //cout << "xc=" << xc << "\n";
       xcR=real(r0);
       xcI=imag(r0);
@@ -1070,7 +1094,7 @@ public:
 #else
       bool fine=false;
 #endif
-      int i,  nf=0, iter, is=0;
+      int i, nf=0, iter, is=0;
       int itmax=1000, nold;
       ntype r;
       cmplx cn;
@@ -1177,7 +1201,7 @@ public:
                 ret = nr_aberth_real(roots[i], roots, i);
 #else
               if (r > 1)
-                ree= nr_aberth_cmplx_rev(roots[i], roots, i);
+                ret= nr_aberth_cmplx_rev(roots[i], roots, i);
               else
                 ret = nr_aberth_cmplx(roots[i], roots, i);
 #endif

@@ -18,7 +18,7 @@ template<class T>
 inline const T MAX(const T &a, const T &b)
         {return b > a ? (b) : (a);}
 
-template <class ntype, int N> 
+template <class ntype, int N, class cmplx> 
 class rpoly_base_static 
 {
 public:
@@ -26,7 +26,9 @@ public:
   constexpr static int dynamic = false;
   pvector<ntype, N+1> coeff;
   pvector<ntype, N+1> cmon;
-  
+  cpoly<cmplx,N,ntype> cpol;
+
+
   void set_coeff(pvector<ntype,N+1> v)
     {
       coeff = v;
@@ -46,7 +48,7 @@ public:
     n=nc;
   }
 };
-template <class ntype, int N> 
+template <class ntype, int N, class cmplx> 
 class rpoly_base_dynamic 
 {
 public:
@@ -54,7 +56,8 @@ public:
   constexpr static int dynamic = true;
   pvector<ntype> coeff;
   pvector<ntype> cmon;
-  
+  cpoly<cmplx,-1,ntype> cpol;
+
   rpoly_base_dynamic() = default;
   void set_coeff(pvector<ntype,-1> v)
     {
@@ -74,7 +77,7 @@ public:
       n=nc;
     }
  
-  rpoly_base_dynamic(int nc): coeff(nc+1), cmon(nc+1)
+  rpoly_base_dynamic(int nc): coeff(nc+1), cmon(nc+1), cpol(nc)
     {
       n=nc;
     }
@@ -83,24 +86,28 @@ public:
     {
       coeff.deallocate();
       cmon.deallocate();
+      cpol.deallocate();
     }
   void allocate(int nc)
     {
       n=nc;
       coeff.allocate(n+1);
       cmon.allocate(n+1);
+      cpol.allocate(n);
     }
 };
 
-template <class ntype, int N> using rpolybase = 
-typename std::conditional<(N>0), rpoly_base_static <ntype, N>,
-	 rpoly_base_dynamic <ntype, N>>::type;
+template <class ntype, int N, class cmplx> using rpolybase = 
+typename std::conditional<(N>0), rpoly_base_static <ntype, N, cmplx>,
+	 rpoly_base_dynamic <ntype, N, cmplx>>::type;
  
 template <class ntype, int N=-1, class cmplx=complex<ntype>> 
-class rpoly: public numeric_limits<ntype>, public rpolybase<ntype,N> {
-  using rpolybase<ntype,N>::n;
-  using rpolybase<ntype,N>::coeff;
-  using rpolybase<ntype,N>::cmon;
+class rpoly: public numeric_limits<ntype>, public rpolybase<ntype,N, cmplx> {
+  using rpolybase<ntype,N,cmplx>::n;
+  using rpolybase<ntype,N,cmplx>::coeff;
+  using rpolybase<ntype,N,cmplx>::cmon;
+  using rpolybase<ntype,N,cmplx>::cpol;
+
   const ntype pigr=acos(ntype(-1.0));
   const cmplx I = cmplx(0.0,1.0);
 
@@ -122,7 +129,6 @@ class rpoly: public numeric_limits<ntype>, public rpolybase<ntype,N> {
   using stlarr = typename std::conditional<(NT>0), std::array<vtype,NT-1>, std::vector<vtype>>::type;
 
   ntype px, dpx; 
-
   const int maxiter_polish=8;
   int imaxarg1,imaxarg2;
   ntype eps05, meps, maxf, maxf2, maxf3, scalfact, cubic_rescal_fact;
@@ -285,16 +291,8 @@ public:
           else 
             {
               /* use aberth method */
-              pvector<cmplx, -1> co(n+1);
-              pvector<cmplx, -1> ro(n);
-              cpoly<cmplx,-1,ntype> pol(n);
-              for (int i=0; i <= n; i++)
-                co[i] = cmplx(coeff[i],0.0);
-              pol.set_coeff(co);
-              pol.find_roots(ro);
-              for (int i=0; i < n; i++)
-                roots[i] = ro[i];
-
+              cpol.set_coeff(coeff);
+              cpol.find_roots(roots);
             }
         }
       else
@@ -319,15 +317,8 @@ public:
           else 
             {
               /* use aberth method */
-              pvector<cmplx, N+1> co;
-              pvector<cmplx, N> ro;
-              cpoly<cmplx,N,ntype> pol;
-              for (int i=0; i <= N; i++)
-                co[i] = cmplx(coeff[i],0.0);
-              pol.set_coeff(co);
-              pol.find_roots(ro);
-              for (int i=0; i < N; i++)
-                roots[i] = ro[i];
+              cpol.set_coeff(coeff);
+              cpol.find_roots(roots);
             }
         }
     }
@@ -361,12 +352,12 @@ public:
     {
       return goaleps;
     } 
-  rpoly(): rpolybase<ntype,N>()
+  rpoly(): rpolybase<ntype,N,cmplx>()
     {
       init_const();
     }
 
-  rpoly(int nc): rpolybase<ntype,N>(nc)
+  rpoly(int nc): rpolybase<ntype,N,cmplx>(nc)
     {
       init_const(); 
     }

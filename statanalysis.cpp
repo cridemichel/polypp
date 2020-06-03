@@ -1,6 +1,11 @@
 #include<stdlib.h>
 #include<stdio.h>
+//#define CPOLY
+#ifdef CPOLY
+#include "./cpoly.hpp"
+#else
 #include "./rpoly.hpp"
+#endif
 #include <complex>
 #define WP 100
 #define MPC_MP
@@ -200,7 +205,11 @@ int main(int argc, char **argv)
   int k, i;
   pvector<pcmplx,-1> csold(NDEG);
   pvector<pdbl,-1> cod(NDEG+1);
+#ifdef CPOLY
+  cpoly<pcmplx,-1,pdbl> oqs;
+#else
   rpoly<pdbl,-1,pcmplx> oqs;
+#endif
   srand48(4242);
   for (k=0; k < PEPTS; k++)
     PEall[k] = 0;

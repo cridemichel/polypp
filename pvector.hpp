@@ -286,7 +286,7 @@ template <class ntype,int NT> using pvecbase = typename std::conditional<(NT>vec
 template <class ntype,int NT=-1> class pvector : public pvecbase<ntype,NT>, vecpars {
   //int vsize;
 #ifdef VEC_COMMA_INIT
-  unsigned int curidx=0;
+  int curidx=0;
 #endif
 public:
   using pvecbase<ntype,NT>::v;
@@ -756,7 +756,7 @@ public:
       int i;
       if (str!=NULL)
 	cout << str;
-      if (maxdigits==0)
+      if (maxdigits<=0)
         maxdigits=32;
       cout << "{";
       for (i=0; i < N; i++)

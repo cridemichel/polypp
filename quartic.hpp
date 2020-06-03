@@ -12,18 +12,108 @@
 #include <array>
 #define Sqr(x) ((x)*(x))
 using namespace std;
-template <class ntype, class cmplx=complex<ntype>> 
-class quartic: public numeric_limits<ntype> {
+
+template <class ntype, class cmplx> 
+class quartic_base_static 
+{
+  const int n=4;
+public:
+  constexpr static int dynamic = false;
+  pvector<ntype, 5> coeff;
+  pvector<ntype, 5> cmon;
+  pvector<cmplx, 5> coeffc;
+  pvector<cmplx, 5> cmonc;
+  int is_cmplx;
+
+  void set_coeff(pvector<ntype,5> v)
+    {
+      is_cmplx = 0;
+      coeff = v;
+      cmon[n] = 1.0;
+      cmonc[n] = 1.0;
+      for (int i=n-1; i >=0; i--)
+        {
+          cmon[i] = coeff[i]/coeff[n];
+          cmonc[i] = cmon[i];
+        }
+    }
+  void set_coeff(pvector<cmplx,5> v)
+    {
+      is_cmplx = 1;
+      coeffc = v;
+      cmonc[n] = 1.0;
+      for (int i=n-1; i >=0; i--)
+        cmonc[i] = coeffc[i]/coeffc[n];
+    }
+
+  quartic_base_static()
+    {
+       // empty
+    }
+};
+template <class ntype, class cmplx> 
+class quartic_base_dynamic 
+{
+  const int n=4;
+public:
+  constexpr static int dynamic = true;
+  pvector<ntype> coeff;
+  pvector<ntype> cmon;
+  pvector<cmplx> cmonc;
+  pvector<cmplx> coeffc;
+  int is_cmplx;
+  quartic_base_dynamic()
+    {
+      coeff.allocate(5);
+      cmon.allocate(5);
+      cmonc.allocate(5);
+      coeffc.allocate(5);
+    }
+  void set_coeff(pvector<ntype,-1> v)
+    {
+      is_cmplx = 0;
+      coeff = v;
+      cmon[n] = 1.0;
+      cmonc[n] = 1.0;
+      for (int i=n-1; i >=0; i--)
+        {
+          cmon[i] = coeff[i]/coeff[n];
+          cmonc[i] = cmon[i];
+        }
+    }
+  void set_coeff(pvector<cmplx,-1> v)
+    {
+      is_cmplx = 1;
+      coeffc = v;
+      cmonc[n] = 1.0;
+      for (int i=n-1; i >=0; i--)
+        cmonc[i] = coeffc[i]/coeffc[n];
+    }
+
+
+  ~quartic_base_dynamic() = default;
+};
+
+template <class ntype, class cmplx, bool dynamic> using quarticbase = 
+typename std::conditional<(dynamic==false), quartic_base_static <ntype, cmplx>,
+	 quartic_base_dynamic <ntype, cmplx>>::type;
+
+template <class ntype, class cmplx=complex<ntype>, bool dynamic=false> 
+class quartic: public numeric_limits<ntype>, public quarticbase<ntype,cmplx, dynamic> {
   const int n=4, N=4;
-  pvector<ntype,5> coeff;
-  pvector<ntype,5> cmon;
-  pvector<cmplx,5> coeffc, cmonc;
+  using quarticbase<ntype,cmplx,dynamic>::coeff;
+  using quarticbase<ntype,cmplx,dynamic>::cmon;
+  using quarticbase<ntype,cmplx,dynamic>::coeffc;
+  using quarticbase<ntype,cmplx,dynamic>::cmonc;
+  using quarticbase<ntype,cmplx,dynamic>::is_cmplx;
+  using roots_vtype = typename std::conditional<(dynamic==false), pvector<cmplx, 4>,
+	 pvector<cmplx, -1>>::type;
+
   const ntype pigr=acos(ntype(-1.0));
   ntype eps05, meps, maxf, maxf2, maxf3, scalfact, cubic_rescal_fact;
   int maxdigits;
   ntype goaleps;
   const cmplx I = sqrt(-1);
-  int is_cmplx;
   ntype oqs_max2(ntype a, ntype b)
     {
       if (a >= b)
@@ -37,8 +127,8 @@ class quartic: public numeric_limits<ntype> {
       t = oqs_max2(a,b);
       return oqs_max2(t,c);
     }
-  inline void oqs_quartic_solver(pvector<cmplx,4>& roots);
-  inline void oqs_quartic_solver_cmplx(pvector<cmplx,4>& roots);      
+  inline void oqs_quartic_solver(roots_vtype& roots);
+  inline void oqs_quartic_solver_cmplx(roots_vtype& roots);      
   inline void oqs_solve_cubic_analytic_depressed_handle_inf(ntype b, ntype c, ntype& sol);
   inline void oqs_solve_cubic_analytic_depressed_handle_inf_cmplx(cmplx b, cmplx c, cmplx& sol);
   inline void oqs_solve_cubic_analytic_depressed(ntype b, ntype c, ntype& sol);
@@ -237,7 +327,7 @@ public:
         }
       return bn;
     }
-  inline void find_roots(pvector<cmplx,4>& roots)
+  inline void find_roots(roots_vtype& roots)
     {
       if (is_cmplx == -1)
         {
@@ -279,34 +369,13 @@ public:
       is_cmplx=-1;
    }
 
-  void set_coeff(pvector<ntype,5> v)
-    {
-      is_cmplx = 0;
-      coeff = v;
-      cmon[n] = 1.0;
-      cmonc[n] = 1.0;
-      for (int i=n-1; i >=0; i--)
-        {
-          cmon[i] = coeff[i]/coeff[n];
-          cmonc[i] = cmon[i];
-        }
-    }
-  void set_coeff(pvector<cmplx,5> v)
-    {
-      is_cmplx = 1;
-      coeffc = v;
-      cmonc[n] = 1.0;
-      for (int i=n-1; i >=0; i--)
-        cmonc[i] = coeffc[i]/coeffc[n];
-    }
-
-  quartic() 
+   quartic() 
     {
       init_const();
     }
 };
 // quartics with OQS
-template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_solve_cubic_analytic_depressed_handle_inf(ntype b, ntype c, ntype& sol)
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx,dynamic>::oqs_solve_cubic_analytic_depressed_handle_inf(ntype b, ntype c, ntype& sol)
 {
  /* find analytically the dominant root of a depressed cubic x^3+b*x+c 
   * where coefficients b and c are large (see sec. 2.2 in the manuscript) */ 
@@ -379,7 +448,7 @@ template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_solve_cubic_a
     }
 }
 
-template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_solve_cubic_analytic_depressed_handle_inf_cmplx(cmplx b, cmplx c, cmplx& sol)
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dynamic>::oqs_solve_cubic_analytic_depressed_handle_inf_cmplx(cmplx b, cmplx c, cmplx& sol)
 {
   /* find analytically the dominant root of a depressed cubic x^3+b*x+c 
    * where coefficients b and c are large (see sec. 2.2 in the manuscript) */ 
@@ -488,7 +557,7 @@ template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_solve_cubic_a
         sol=asol[2];
     }
 }
-template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_solve_cubic_analytic_depressed_cmplx(cmplx b, cmplx c, cmplx& sol)
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dynamic>::oqs_solve_cubic_analytic_depressed_cmplx(cmplx b, cmplx c, cmplx& sol)
 {
   /* find analytically the dominant root of a depressed cubic x^3+b*x+c 
    * (see sec. 2.2 in the manuscript) */ 
@@ -565,7 +634,7 @@ template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_solve_cubic_a
 }
 
 
-template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_solve_cubic_analytic_depressed(ntype b, ntype c, ntype& sol)
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx,dynamic>::oqs_solve_cubic_analytic_depressed(ntype b, ntype c, ntype& sol)
 {
   /* find analytically the dominant root of a depressed cubic x^3+b*x+c 
    * (see sec. 2.2 in the manuscript) */ 
@@ -615,7 +684,7 @@ template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_solve_cubic_a
       sol = A+B; /* this is always largest root even if A=B */
     }
 }
-template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_calc_phi0_cmplx(cmplx a, cmplx b, cmplx c, cmplx d, cmplx& phi0, int scaled)
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dynamic>::oqs_calc_phi0_cmplx(cmplx a, cmplx b, cmplx c, cmplx d, cmplx& phi0, int scaled)
 {
   /* find phi0 as the dominant root of the depressed and shifted cubic 
    * in eq. (79) (see also the discussion in sec. 2.2 of the manuscript) */
@@ -733,7 +802,7 @@ template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_calc_phi0_cmp
     }
   phi0 = x;
 }
-template <class ntype, class cmplx> void  quartic<ntype, cmplx>::oqs_calc_phi0(ntype a, ntype b, ntype c, ntype d, ntype& phi0, int scaled)
+template <class ntype, class cmplx, bool dynamic> void  quartic<ntype, cmplx, dynamic>::oqs_calc_phi0(ntype a, ntype b, ntype c, ntype d, ntype& phi0, int scaled)
 {
   /* find phi0 as the dominant root of the depressed and shifted cubic 
    * in eq. (64) (see also the discussion in sec. 2.2 of the manuscript) */
@@ -833,7 +902,7 @@ template <class ntype, class cmplx> void  quartic<ntype, cmplx>::oqs_calc_phi0(n
     }
   phi0 = x;
 }
-template <class ntype, class cmplx> ntype  quartic<ntype,cmplx>::oqs_calc_err_ldlt(ntype b, ntype c, ntype d, ntype d2, ntype l1, ntype l2, ntype l3)
+template <class ntype, class cmplx, bool dynamic> ntype  quartic<ntype,cmplx, dynamic>::oqs_calc_err_ldlt(ntype b, ntype c, ntype d, ntype d2, ntype l1, ntype l2, ntype l3)
 {
   /* Eq. (21) in the manuscript */
   ntype sum;
@@ -851,8 +920,8 @@ template <class ntype, class cmplx> ntype  quartic<ntype,cmplx>::oqs_calc_err_ld
     sum += abs(((d2*l2*l2 + l3*l3)-d)/d);
   return sum;
 }
-template <class ntype, class cmplx> 
-ntype quartic<ntype, cmplx>::oqs_calc_err_abcd_cmplx(ntype a, ntype b,  ntype c, ntype d, cmplx aq, 
+template <class ntype, class cmplx, bool dynamic> 
+ntype quartic<ntype, cmplx, dynamic>::oqs_calc_err_abcd_cmplx(ntype a, ntype b,  ntype c, ntype d, cmplx aq, 
                                                        cmplx bq, cmplx cq, cmplx dq)
 {
   /* Eq. (53) in the manuscript for complex alpha1 (aq), beta1 (bq), alpha2 (cq) and beta2 (dq) */
@@ -863,7 +932,7 @@ ntype quartic<ntype, cmplx>::oqs_calc_err_abcd_cmplx(ntype a, ntype b,  ntype c,
   sum +=(a==0)?abs(aq + cq):abs(((aq + cq) - a)/a);
   return sum;
 }
-template <class ntype, class cmplx> ntype quartic<ntype, cmplx>::oqs_calc_err_abcd(ntype a, ntype b, ntype c, ntype d, ntype aq, ntype bq, ntype cq, ntype dq)
+template <class ntype, class cmplx, bool dynamic> ntype quartic<ntype, cmplx, dynamic>::oqs_calc_err_abcd(ntype a, ntype b, ntype c, ntype d, ntype aq, ntype bq, ntype cq, ntype dq)
 {
   /* Eq. (53) in the manuscript for real alpha1 (aq), beta1 (bq), alpha2 (cq) and beta2 (dq)*/
   ntype sum;
@@ -888,7 +957,7 @@ template <class ntype, class cmplx> ntype quartic<ntype, cmplx>::oqs_calc_err_ab
     sum +=abs(((aq + cq) - a)/a);
   return sum;
 }
-template <class ntype, class cmplx> ntype  quartic<ntype,cmplx>::oqs_calc_err_abc(ntype a, ntype b, ntype c, ntype aq, ntype bq, ntype cq, ntype dq)
+template <class ntype, class cmplx, bool dynamic> ntype  quartic<ntype,cmplx, dynamic>::oqs_calc_err_abc(ntype a, ntype b, ntype c, ntype aq, ntype bq, ntype cq, ntype dq)
 {
   /* Eq. (40) in the manuscript */
   ntype sum;
@@ -906,7 +975,7 @@ template <class ntype, class cmplx> ntype  quartic<ntype,cmplx>::oqs_calc_err_ab
     sum +=abs(((aq + cq) - a)/a);
   return sum;
 }
-template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_NRabcd(ntype a, ntype b, ntype c, ntype d, ntype& AQ, ntype& BQ, ntype& CQ, ntype& DQ)
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dynamic>::oqs_NRabcd(ntype a, ntype b, ntype c, ntype d, ntype& AQ, ntype& BQ, ntype& CQ, ntype& DQ)
 {
   /* Newton-Raphson described in sec. 2.3 of the manuscript for complex
    * coefficients a,b,c,d */
@@ -995,7 +1064,7 @@ template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_NRabcd(ntype 
   DQ=x[3];
 }
 
-template <class ntype, class cmplx> void quartic<ntype,cmplx>::NRabcdCCmplx(cmplx a, cmplx b, cmplx c, cmplx d, 
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dynamic>::NRabcdCCmplx(cmplx a, cmplx b, cmplx c, cmplx d, 
                   cmplx& AQ, cmplx& BQ, cmplx& CQ, cmplx& DQ)
 {
   /* Newton-Raphson described in sec. 2.3 of the manuscript for complex
@@ -1086,7 +1155,7 @@ template <class ntype, class cmplx> void quartic<ntype,cmplx>::NRabcdCCmplx(cmpl
   DQ=x[3];
 }
 
-template <class ntype, class cmplx> void  quartic<ntype,cmplx>::oqs_solve_quadratic(ntype a, ntype b, cmplx roots[2])
+template <class ntype, class cmplx, bool dynamic> void  quartic<ntype,cmplx, dynamic>::oqs_solve_quadratic(ntype a, ntype b, cmplx roots[2])
 { 
   ntype div,sqrtd,diskr,zmax,zmin;
   diskr=a*a-4.0*b;   
@@ -1113,7 +1182,7 @@ template <class ntype, class cmplx> void  quartic<ntype,cmplx>::oqs_solve_quadra
       roots[1]=cmplx(-a/2.0,-sqrtd/2.0);      
     }   
 }
-template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_quartic_solver(pvector<cmplx,4>& roots)
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dynamic>::oqs_quartic_solver(roots_vtype& roots)
 {
   /* USAGE:
    *
@@ -1406,7 +1475,7 @@ template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_quartic_solve
         }
     }
 }
-template <class ntype, class cmplx> void quartic<ntype,cmplx>::oqs_quartic_solver_cmplx(pvector<cmplx,4>& roots)      
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dynamic>::oqs_quartic_solver_cmplx(roots_vtype& roots)      
 {
   /* USAGE:
    *
