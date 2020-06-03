@@ -7,7 +7,7 @@
 #else
 #include "./rpoly.hpp"
 #endif
-#define WP 60
+#define WP 100
 #define WPBS 200
 #define MPC_MP
 #ifdef CPP_MP
@@ -52,7 +52,7 @@ using cmplx=complex<numty>;
 
 //#include<complex>
 #ifndef NDEG
-#define NDEG 6
+#define NDEG 50
 #endif
 
 double gauss(void)
