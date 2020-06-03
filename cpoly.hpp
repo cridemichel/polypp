@@ -1241,22 +1241,45 @@ public:
   // find roots by default uses aberth method which is faster than laguerre implicit method
   inline void find_roots(pvector<cmplx,N>& roots)
     {
-      if (n==2)
-        {
-          solve_quadratic(roots); 
-        }
-      else if (n==3)
-        {
-          solve_cubic(roots);
-        }
-      else if (n==4)
-        {
-          quar.set_coeff(coeff);
-          quar.find_roots(roots);
+      if constexpr (N > 0)
+        {  
+          if constexpr (N==2)
+            {
+              solve_quadratic(roots); 
+            }
+          else if constexpr (N==3)
+            {
+              solve_cubic(roots);
+            }
+          else if constexpr (N==4)
+            {
+              quar.set_coeff(coeff);
+              quar.find_roots(roots);
+            }
+          else
+            {
+              aberth(roots, gpolish);
+            }
         }
       else
         {
-          aberth(roots, gpolish);
+          if (n==2)
+            {
+              solve_quadratic(roots); 
+            }
+          else if (n==3)
+            {
+              solve_cubic(roots);
+            }
+          else if (n==4)
+            {
+              quar.set_coeff(coeff);
+              quar.find_roots(roots);
+            }
+          else
+            {
+              aberth(roots, gpolish);
+            }
         }
     }
 

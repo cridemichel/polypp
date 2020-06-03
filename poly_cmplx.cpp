@@ -5,7 +5,7 @@
 #define WP 50
 // N.B. you can use either CPP, GMP or MPC backend by
 // defining CPP_MP, GMP_MP or MPC_MP
-#define NDEG 20
+#define NDEG 5
 #define MPC_MP
 #ifdef CPP_MP
 #include <boost/multiprecision/cpp_bin_float.hpp> 
@@ -47,7 +47,8 @@ int main(void)
       c[i] = mpcmplx(1,1);
     }
   P.set_coeff(c);
-  P.find_roots(r);
+  //P.find_roots(r);
+  P.aberth(r);
   //r.show("roots");
   int cc=0;
   for (auto& r0: r)
