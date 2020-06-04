@@ -52,7 +52,8 @@ ifeq ($(PARALLEL),)
 PARALLEL=0
 endif
 LIBS=$(HBLIBS) 
-CXXFLAGS= -Wall -std=c++17 -O3 $(HBHDRS) 
+CXXFLAGS= -Wall -std=c++17 -O3 
+CXXFLAGSMP=$(CXXFLAGS) $(HBHDRS)
 HEADERS=quartic.hpp pvector.hpp rpoly.hpp cpoly.hpp
 ifeq ($(PARALLEL),1)
   PARFLA=-fopenmp
@@ -67,16 +68,16 @@ poly_real: poly_real.cpp $(HEADERS)
 	$(CXX) poly_real.cpp $(CXXFLAGS) -o poly_real 
 
 poly_cmplx: poly_cmplx.cpp $(HEADERS) 
-	$(CXX) poly_cmplx.cpp $(CXXFLAGS) $(LDFLAGS) -o poly_cmplx   
+	$(CXX) poly_cmplx.cpp $(CXXFLAGSMP) $(LDFLAGS) -o poly_cmplx   
 
 poly_mp: poly_mp.cpp $(HEADERS) 
-	$(CXX) poly_mp.cpp $(CXXFLAGS) $(LDFLAGS) -o poly_mp   
+	$(CXX) poly_mp.cpp $(CXXFLAGSMP) $(LDFLAGS) -o poly_mp   
 
 statanalysis: statanalysis.cpp $(HEADERS)
-	$(CXX) statanalysis.cpp $(CXXFLAGS) $(LDFLAGS) -o statanalysis 
+	$(CXX) statanalysis.cpp $(CXXFLAGSMP) $(LDFLAGS) -o statanalysis 
 
 timingtgest: timingtest.cpp $(HEADERS)
-	$(CXX) timingtest.cpp $(CXXFLAGS) $(LDFLAGS) -o timingtest 
+	$(CXX) timingtest.cpp $(CXXFLAGSMP) $(LDFLAGS) -o timingtest 
 
 clean:
 	rm -f timingtest poly_real poly_cmplx poly_mp statanalysis *.o
