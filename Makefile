@@ -1,19 +1,24 @@
 ifeq (,$(findstring intercept,$(CXX)))
-CXX=g++
-endif
-#ifneq ($(CC),intercept-c)
-ifeq (,$(findstring intercept,$(CC)))
-CC=gcc
+CXX=g++-9
 endif
 ############################################################
 #change these directories to reflect your boost installation
 BOOSTLIBDIR=/usr/local/lib 
 BOOSTHDRDIR=/usr/local/include
 ############################################################
+# if PARALLEL is set to 1 parallelization through openmp is enabled,
+# but you have to use gnu gcc for this.
+PARALLEL=0
 BOOST_LIB=-L $(BOOSTLIBDIR) -lmpc -lmpfr -lgmp
 CXXFLAGS= -Wall -std=c++17 -O3 -I $(BOOSTHDRDIR) 
-HEADERS=./quartic.hpp ./pvector.hpp ./rpoly.hpp ./cpoly.hpp
-LDFLAGS=-lm -llapack -lblas $(BOOST_LIB) 
+HEADERS=quartic.hpp pvector.hpp rpoly.hpp cpoly.hpp
+ifeq ($(PARALLEL),1)
+  PARFLA=-fopenmp
+else
+  PARGLA=
+endif 
+LDFLAGS=-lm -llapack -lblas $(BOOST_LIB) $(PARFLA)
+
 all: statanalysis poly_real poly_mp poly_cmplx timingtest
 
 poly_real: poly_real.cpp $(HEADERS)

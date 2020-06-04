@@ -52,7 +52,7 @@ using cmplx=complex<numty>;
 
 //#include<complex>
 #ifndef NDEG
-#define NDEG 10
+#define NDEG 1000
 #endif
 
 double gauss(void)

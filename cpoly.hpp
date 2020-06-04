@@ -34,12 +34,15 @@
 #include <cstdlib>
 #include <vector>
 #include <array>
+// To enable parallelizazion use gnu g++ and use the flag -fopenmp, i.e.
+// g++ -fopenmp ... 
 #if defined(_OPENMP)
 #include<omp.h>
 #endif
 #define Sqr(x) ((x)*(x))
 //#define BINI_CONV_CRIT // Bini stopping criterion is slightly less accurate and slightly slower than Cameron one.
-#define USE_CONVEX_HULL // <---- faster
+#define USE_CONVEX_HULL // <- faster (from  T. R. Cameron, Numerical Algorithms, 82, 1065–1084 (2019)
+ 
 #define USE_ABERTH_REAL //<--- faster
 #if defined(_OPENMP)
 #define USE_ROLD
@@ -146,7 +149,6 @@ public:
   //  ,rold(nc)
 #endif
   {
-    //cout << "n=" << nc << " QUI<=\n ";
     n=nc;
   }
   ~cpoly_base_dynamic() = default;
@@ -965,7 +967,7 @@ public:
         }  
       q--;
       //sigma=2.0*M_PI*(drand48()-0.5);
-      sigma=0.7;//-0.01;
+      sigma=0.7;
       rg.resize(n); 
       int cc=0, dk;
       for (i=1; i < q; i++)
@@ -979,7 +981,7 @@ public:
         }
 #else
       //sigma=2.0*M_PI*(drand48()-0.5);
-      sigma=0.7;//-0.01;
+      sigma=0.7;
       rg.resize(n); 
       int cc=0;
 
@@ -1331,7 +1333,12 @@ public:
       Kconv=3.8;
       gpolish=false;
       guess_provided=false;
-      use_dbl_iniguess=true; // calculate initial guess using double precision (much faster!)
+      // calculate initial guess using long double precision (much faster!)
+      // MPSolve calculate the initial guess using double.
+      // It is not recommended to set this to false if using multiple precision
+      // since in this case the initial guess becomes the bottleneck of the algorithm
+      // which slows down by a factor 3.
+      use_dbl_iniguess=true; 
     }
   cpoly()
     {
