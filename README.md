@@ -82,4 +82,9 @@ and to execute the timing test in parallel, do:
 > time ./timingtest 1
 ```
 where you can play with the number of threads by changing the value of the environment variable OMP_NUM_THREADES 
-and the degree of the polynomial used for the timing test by changing the macro NDEG in the file timingtest.cpp. Enjoy!
+and the degree of the polynomial used for the timing test by changing the macro NDEG in the file timingtest.cpp. 
+The present solver has an efficiency comparable to that of MPSolve (https://numpi.dm.unipi.it/software/mpsolve),
+but it does not perform any cluster analysis to boost the convergence in case of multiple roots and you can just
+set the working precision and not the precision of the roots.
+
+Enjoy!
