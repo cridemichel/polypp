@@ -2,14 +2,16 @@ ifeq (,$(findstring intercept,$(CXX)))
 CXX=g++-9
 endif
 ############################################################
-#change these directories to reflect your boost installation
-BOOSTLIBDIR=/usr/local/lib 
-BOOSTHDRDIR=/usr/local/include
+#change this directories to reflect your boost installation
+ifeq ($(BOOSTDIR),)
+BOOSTDIR=/usr/local/
+endif
 ############################################################
-# if PARALLEL is set to 1 parallelization through openmp is enabled,
+BOOSTLIBDIR=$(BOOSTDIR)/lib 
+BOOSTHDRDIR=$(BOOSTDIR)/include # if PARALLEL is set to 1 parallelization through openmp is enabled,
 # but you have to use gnu gcc for this.
 PARALLEL=1
-BOOST_LIB=-L $(BOOSTLIBDIR) -lmpc -lmpfr -lgmp
+BOOST_LIB=-L $(BOOSTLIBDIR) -lmpc -lmpfr -lgmp -lgmpxx
 CXXFLAGS= -Wall -std=c++17 -O3 -I $(BOOSTHDRDIR) 
 HEADERS=quartic.hpp pvector.hpp rpoly.hpp cpoly.hpp
 ifeq ($(PARALLEL),1)
