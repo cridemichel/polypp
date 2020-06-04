@@ -90,7 +90,7 @@ but it does not perform any cluster analysis to boost the convergence in case of
 set the working precision and not the precision of the roots.
 
 Finally, note that the class itself can be used without boost and gmp and it does not require gcc from homebrew. 
-This means that the poly_real example can be simply compiled by the command:
+This means that the poly_real example can be straightforwardly compiled by the command:
 ```shell
 make poly_real
 ```
