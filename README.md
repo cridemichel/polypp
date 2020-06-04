@@ -70,6 +70,16 @@ where:
 
 *degree*: degree of the polynomials.
 
+**timingtest**:
+
+this program performs a timing test of the polynomial solver. The syntax is the following (where '>' is the shell prompt string):
+
+> time timingtest <trials>
+
+where
+
+<trials> is the number of quartic equations to solve. 
+
 **Parallelization**
 
 Parallel calculation of roots is implemeneted through OpenMP (https://www.openmp.org/). 
