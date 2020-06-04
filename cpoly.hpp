@@ -990,7 +990,7 @@ public:
           dk = k[i+1]-k[i];
           for (j=1; j <= dk; j++)
             {
-              rg[(k[i]+j-1)] = polar(ntype(uk[k[i+1]]),ntype(j*2.0*M_PI/dk+2.0*M_PI*ntype(i)/ntype(n)+sigma));
+              rg[(k[i]+j-1)] = polar(ntype(uk[k[i+1]]),ntype(j*2.0*pigr/dk+2.0*pigr*ntype(i)/ntype(n)+sigma));
               cc++;
             }
         }
@@ -1006,7 +1006,7 @@ public:
           ukip1 = pow(abs(cmon[k[i+1]]/cmon[k[i]]),1.0/(k[i]-k[i+1]));
           for (j=1; j <= k[i]-k[i+1]; j++)
             {
-              rg[cc] = polar(ukip1,ntype(j*2.0*M_PI/(k[i]-k[i+1])+2.0*M_PI*ntype(i)/ntype(n)+sigma));
+              rg[cc] = polar(ukip1,ntype(j*2.0*pigr/(k[i]-k[i+1])+2.0*pigr*ntype(i)/ntype(n)+sigma));
               cc++;
             }
         }
