@@ -92,6 +92,6 @@ set the working precision and not the precision of the roots.
 Finally, note that the class itself can be used without boost and gmp and it does not require gcc from homebrew. 
 This means that the poly_real example can be simply compiled by the command:
 ```shell
-make quartic
+make poly_real
 ```
 Enjoy!
