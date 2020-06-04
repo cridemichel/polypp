@@ -49,7 +49,7 @@ ifeq ($(PARALLEL),1)
 else
   PARGLA=
 endif 
-LDFLAGS=-lm -llapack -lblas $(LIBS) $(PARFLA)
+LDFLAGS=-lm $(LIBS) $(PARFLA)
 
 all: statanalysis poly_real poly_mp poly_cmplx timingtest
 
