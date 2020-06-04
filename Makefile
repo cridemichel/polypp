@@ -76,7 +76,7 @@ poly_mp: poly_mp.cpp $(HEADERS)
 statanalysis: statanalysis.cpp $(HEADERS)
 	$(CXX) statanalysis.cpp $(CXXFLAGSMP) $(LDFLAGS) -o statanalysis 
 
-timingtgest: timingtest.cpp $(HEADERS)
+timingtest: timingtest.cpp $(HEADERS)
 	$(CXX) timingtest.cpp $(CXXFLAGSMP) $(LDFLAGS) -o timingtest 
 
 clean:
