@@ -89,4 +89,9 @@ The present solver has an efficiency comparable to that of MPSolve (https://nump
 but it does not perform any cluster analysis to boost the convergence in case of multiple roots and you can just
 set the working precision and not the precision of the roots.
 
+Finally, note that the class itself can be used without boost and gmp and it does not require gcc from homebrew. 
+This means that the poly_real example can be simply compiled by the command:
+```shell
+make quartic
+```
 Enjoy!
