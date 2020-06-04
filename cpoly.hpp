@@ -61,8 +61,7 @@ public:
   pvector<cmplx, N-1> abscmon;
   pvector<ntype, N+1> alpha;
   quartic<ntype,cmplx,false> quar;
-
-
+  bool found[N];
 #ifdef USE_ROLD
   pvector<cmplx, N> rold;
 #endif
@@ -111,6 +110,7 @@ public:
 #endif
   pvector<dcmplx> droots;
   quartic<ntype,cmplx,true> quar;
+  bool *found;
 
   cpoly_base_dynamic() = default;
 
@@ -145,13 +145,17 @@ public:
     }
 
   cpoly_base_dynamic(int nc): coeff(nc+1), cmon(nc+1), acmon(nc+1), alpha(nc+1), droots(nc)
-#ifdef USE_ROLD
-  //  ,rold(nc)
-#endif
   {
+#ifdef USE_ROLD
+    rold.allocate(nc);
+#endif
+    found = new bool[nc];
     n=nc;
   }
-  ~cpoly_base_dynamic() = default;
+  ~cpoly_base_dynamic()
+    {
+      delete[] found;
+    }
   void deallocate(void)
     {
       coeff.deallocate();
@@ -159,9 +163,10 @@ public:
       acmon.deallocate();
       alpha.deallocate();
 #ifdef USE_ROLD
-      //rold.deallocate();
+      rold.deallocate();
 #endif
       droots.deallocate();
+      delete[] found;
     }
   void allocate(int nc)
     {
@@ -171,9 +176,10 @@ public:
       acmon.allocate(n+1);
       alpha.allocate(n+1);
 #ifdef USE_ROLD
-      //rold.allocate(n);
+      rold.allocate(n);
 #endif
       droots.allocate(n);
+      found = new bool[n];
     }
 };
 
@@ -191,7 +197,7 @@ class cpoly: public numeric_limits<ntype>, public cpolybase<cmplx,ntype,dcmplx,N
   using cpolybase<cmplx,ntype,dcmplx,N>::alpha;
   using cpolybase<cmplx,ntype,dcmplx,N>::droots;
   using cpolybase<cmplx,ntype,dcmplx,N>::quar;
-
+  using cpolybase<cmplx,ntype,dcmplx,N>::found;
   const ntype pigr=acos(ntype(-1.0));
   const cmplx I = cmplx(0.0,1.0);
  
@@ -218,6 +224,60 @@ class cpoly: public numeric_limits<ntype>, public cpolybase<cmplx,ntype,dcmplx,N
   bool gpolish;
   bool use_dbl_iniguess;
   bool guess_provided;
+
+#ifdef USE_CONVEX_HULL
+  using point=pair<ntype,ntype>; 
+
+  typedef ntype coord_t;   // coordinate type
+  typedef ntype coord2_t;  // must be big enough to hold 2*max(|coordinate|)^2
+
+  struct Point {
+    coord_t x;
+    coord_t y;
+    bool operator <(const Point &p) const {
+      return x < p.x || (x == p.x && y < p.y);
+    }
+  };
+  // 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
+  // Returns a positive value, if OAB makes a clockwise turn,
+  // negative for counter-clockwise turn, and zero if the points are collinear.
+  vector<Point> pts, convh;
+
+  coord2_t cross(const Point &O, const Point &A, const Point &B)
+    {
+      return ((A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x));
+    }
+
+  // Returns a list of points on the convex hull in counter-clockwise order.
+  // Note: the last point in the returned list is the same as the first one.
+  // Method: Andrew’s monotone chain algorithm O(n) in this case since we do not need sorting
+  vector<Point> upper_convex_hull(vector<Point> P)
+    {
+      int n = P.size(), k = 0;
+      if (n <= 3) 
+        return P;
+      vector<Point> H(n+1);
+      // points are already ordered in the present case!
+      //sort(P.begin(), P.end());
+      // we need just upper hull for Bini's algorithm
+      // Build upper hull
+      for (int i = n-1; i >= 0; i--) {
+        while (k >= 2 && cross(H[k-1], H[k], P[i]) < 0) 
+          {
+            k--;
+          }
+        k++;
+        H[k] = P[i];
+      }
+      H.resize(k+1);
+      return H;
+    }
+#else
+  vector<ntype> vk, uk;
+#endif
+  vector<cmplx> rg;
+  vector<int> k;
+
 public:
   void use_this_guess(pvector<dcmplx,N>& rg)
     {
@@ -352,7 +412,9 @@ public:
   bool nr_aberth_real_rev(cmplx &r0, pvector<cmplx,N> &roots, int iac)
     {
       int j;
+#ifndef BINI_CONV_CRIT
       ntype err;
+#endif
       cmplx p1pc;
       const ntype EPS=goaleps;
       // root polishing by NR
@@ -438,14 +500,18 @@ public:
   bool nr_aberth_real(cmplx &r0, pvector<cmplx,N> &roots, int iac)
     {
       int j;
+#ifndef BINI_CONV_CRIT
       ntype err;
+#endif
       cmplx p1pc;
       const ntype EPS=goaleps;
       // root polishing by NR
       ntype aR, aI, p1p[2];
-      ntype absp, abx, p10, p0, x[2], p[2], p1[2], dx[2], invden;
+      ntype abx, p10, p0, x[2], p[2], p1[2], dx[2], invden;
 #ifdef BINI_CONV_CRIT
       ntype s;
+#else
+      ntype absp;
 #endif
       x[0] = r0.real();
       x[1] = r0.imag();
@@ -818,64 +884,15 @@ public:
 
       return ximax;
     }
-  using point=pair<ntype,ntype>; 
-
-  typedef ntype coord_t;   // coordinate type
-  typedef ntype coord2_t;  // must be big enough to hold 2*max(|coordinate|)^2
-
-  struct Point {
-    coord_t x;
-    coord_t y;
-    bool operator <(const Point &p) const {
-      return x < p.x || (x == p.x && y < p.y);
-    }
-  };
-  // 2D cross product of OA and OB vectors, i.e. z-component of their 3D cross product.
-  // Returns a positive value, if OAB makes a clockwise turn,
-  // negative for counter-clockwise turn, and zero if the points are collinear.
-  coord2_t cross(const Point &O, const Point &A, const Point &B)
-    {
-      return ((A.x - O.x) * (B.y - O.y) - (A.y - O.y) * (B.x - O.x));
-    }
-
-  // Returns a list of points on the convex hull in counter-clockwise order.
-  // Note: the last point in the returned list is the same as the first one.
-  // Method: Andrew’s monotone chain algorithm O(n) in this case since we do not need sorting
-  vector<Point> upper_convex_hull(vector<Point> P)
-    {
-      int n = P.size(), k = 0;
-      if (n <= 3) 
-        return P;
-      vector<Point> H(n+1);
-      // points are already ordered in the present case!
-      //sort(P.begin(), P.end());
-      // we need just upper hull for Bini's algorithm
-      // Build upper hull
-      for (int i = n-1; i >= 0; i--) {
-        while (k >= 2 && cross(H[k-1], H[k], P[i]) < 0) 
-          {
-            k--;
-          }
-        k++;
-        H[k] = P[i];
-      }
-      H.resize(k+1);
-      return H;
-    }
   void initial_guess(pvector<cmplx,N>& roots)
     {
-#ifdef USE_CONVEX_HULL
-      vector<Point> pts, convh;
-#endif
-      vector<cmplx> rg;
-      vector<int> k;
       ntype sigma;
 #ifndef USE_CONVEX_HULL
-      ntype ukc, vkc, maxt, t;
+      ntype ukc, vkc, maxt=0.0, t;
 #endif
-      Point p;
       int q, i, j;
 #ifdef USE_CONVEX_HULL
+      Point p;
       pts.resize(n+1);
       for (i = 0; i <= n; i++)
         {
@@ -909,9 +926,7 @@ public:
           k[i] = ((int)convh[i].x);
         }
 #endif
-      ntype ukip1;
 #ifndef USE_CONVEX_HULL
-      vector<ntype> vk, uk;
       int kk;
       vk.resize(n+1);
       uk.resize(n+1);
@@ -981,6 +996,7 @@ public:
         }
 #else
       //sigma=2.0*M_PI*(drand48()-0.5);
+      ntype ukip1;
       sigma=0.7;
       rg.resize(n); 
       int cc=0;
@@ -1004,7 +1020,7 @@ public:
 
   void aberth(pvector<cmplx,N>& roots, bool polish=false)
     {
-      bool *found = new bool[n], ret;
+      bool ret;
 #ifdef _OPENMP
       volatile bool fine=false;
 #else
@@ -1014,10 +1030,6 @@ public:
       int itmax=1000, nold;
       ntype r;
       cmplx cn;
-#ifdef USE_ROLD
-      if constexpr (N < 0)
-        rold.allocate(n);
-#endif
       if (coeff[n]==cmplx(0.0,0.0))
         {
           cout << "That's not an " << n << " degree polynomial!\n";
@@ -1160,11 +1172,6 @@ public:
             refine_root_maehly(roots[i], roots, i);
         }
       n=nold;
-      delete []found;
-#ifdef ROLD
-      if constexpr (N < 0)
-        rold.deallocate();
-#endif
     }
    
 

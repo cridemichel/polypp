@@ -8,7 +8,7 @@ BOOSTHDRDIR=/usr/local/include
 ############################################################
 # if PARALLEL is set to 1 parallelization through openmp is enabled,
 # but you have to use gnu gcc for this.
-PARALLEL=0
+PARALLEL=1
 BOOST_LIB=-L $(BOOSTLIBDIR) -lmpc -lmpfr -lgmp
 CXXFLAGS= -Wall -std=c++17 -O3 -I $(BOOSTHDRDIR) 
 HEADERS=quartic.hpp pvector.hpp rpoly.hpp cpoly.hpp

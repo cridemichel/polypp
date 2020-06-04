@@ -113,7 +113,7 @@ class quartic: public numeric_limits<ntype>, public quarticbase<ntype,cmplx, dyn
   ntype eps05, meps, maxf, maxf2, maxf3, scalfact, cubic_rescal_fact;
   int maxdigits;
   ntype goaleps;
-  const cmplx I = sqrt(-1);
+  const cmplx I = cmplx(0.0,1.0);
   ntype oqs_max2(ntype a, ntype b)
     {
       if (a >= b)

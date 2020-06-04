@@ -9,7 +9,8 @@
 #endif
 #define WP 100
 #define WPBS 200
-#define MPC_MP
+//#define MPC_MP
+#define GMP_MP
 #ifdef CPP_MP
 #include <boost/multiprecision/cpp_bin_float.hpp> 
 #include <boost/multiprecision/cpp_complex.hpp>
@@ -20,6 +21,7 @@ using numty = number<cpp_bin_float<WP>>;
 using cmplx = cpp_complex<WP>;
 #elif defined(GMP_MP)
 #include <boost/multiprecision/gmp.hpp>
+#include <boost/multiprecision/complex_adaptor.hpp>
 using namespace boost;
 using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
