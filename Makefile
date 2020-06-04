@@ -1,32 +1,32 @@
-# check if homebrew is installed 
+ifneq ($(MAKECMDGOALS),poly_real)
 ifeq ($(shell which brew),)
-   $(error Please install homebrew first!)
+  $(error Please install homebrew first!)
 endif
-
+# check if homebrew is installed 
 HBPACK=$(shell brew ls --versions gmp gcc@9 boost) 
 ifeq ($(shell echo $(HBPACK)),)
-   $(warning Please install gmp, boost and gcc@9 homebrew packages through the command:)
-   $(warning > brew install gmp boost gcc@9)
-   $(error Aborting...)
+  $(warning Please install gmp, boost and gcc@9 homebrew packages through the command:)
+  $(warning > brew install gmp boost gcc@9)
+  $(error Aborting...)
 endif
 ifeq ($(shell echo $(HBPACK)|grep gmp),)
-   $(warning Please install gmp homebrew packages through the command:)
-   $(warning > brew install gmp)
-   $(error Aborting...)
+  $(warning Please install gmp homebrew packages through the command:)
+  $(warning > brew install gmp)
+  $(error Aborting...)
 endif
 ifeq ($(shell echo $(HBPACK)|grep gcc | grep 9),)
-   $(warning Please install gcc homebrew packages through the command:)
-   $(warning > brew install gcc@9)
-   $(error Aborting...)
+  $(warning Please install gcc homebrew packages through the command:)
+  $(warning > brew install gcc@9)
+  $(error Aborting...)
 endif
 ifeq ($(shell echo $(HBPACK)|grep boost),)
-   $(warning Please install boost homebrew packages through the command:)
-   $(warning > brew install boost)
-   $(error Aborting...)
+  $(warning Please install boost homebrew packages through the command:)
+  $(warning > brew install boost)
+  $(error Aborting...)
 endif
-
+endif
 ifeq ($(HBDIR),)
-HBDIR=$(shell brew --prefix)
+  HBDIR=$(shell brew --prefix)
 endif
 ifeq (,$(findstring intercept,$(CXX)))
   CXXHB=$(HBDIR)/bin/g++-9
