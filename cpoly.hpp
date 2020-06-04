@@ -1208,9 +1208,9 @@ public:
           if (R2r < Q3r)
             {
               theta = acos(R.real()/sqrt(Q3r));
-              sol[0] = -2.0*sqrt(Q.real())*cos(theta/3.0)- a/cmplx(3.0);
-              sol[1] = -2.0*sqrt(Q.real())*cos((theta+2.0*M_PI)/3.0) - a/cmplx(3.0);
-              sol[2] = -2.0*sqrt(Q.real())*cos((theta-2.0*M_PI)/3.0) - a/cmplx(3.0);
+              sol[0] = -ntype(2.0)*sqrt(Q.real())*cos(theta/ntype(3.0))- a/cmplx(3.0);
+              sol[1] = -ntype(2.0)*sqrt(Q.real())*cos((theta+ntype(2.0)*pigr)/ntype(3.0)) - a/cmplx(3.0);
+              sol[2] = -ntype(2.0)*sqrt(Q.real())*cos((theta-ntype(2.0)*pigr)/ntype(3.0)) - a/cmplx(3.0);
             }
           else
             {
@@ -1220,8 +1220,8 @@ public:
               else
                 Br = Q.real()/Ar;
               sol[0] = (Ar+Br) - a/cmplx(3.0);
-              sol[1] = -0.5*(Ar+Br)-a/cmplx(3.0)+I*sqrt3*(Ar-Br);
-              sol[2] = -0.5*(Ar+Br)-a/cmplx(3.0)-I*sqrt3*(Ar-Br);
+              sol[1] = -ntype(0.5)*(Ar+Br)-a/cmplx(3.0)+I*sqrt3*(Ar-Br);
+              sol[2] = -ntype(0.5)*(Ar+Br)-a/cmplx(3.0)-I*sqrt3*(Ar-Br);
             }
         }
       else

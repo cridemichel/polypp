@@ -405,8 +405,8 @@ template <class ntype, int N, class cmplx> void rpoly<ntype,N, cmplx>::solve_cub
     {
       theta = acos(R/sqrt(Q3));
       sol[0] = -2.0*sqrt(Q)*cos(theta/3.0)- a/3.0;
-      sol[1] = -2.0*sqrt(Q)*cos((theta+2.0*M_PI)/3.0) - a/3.0;
-      sol[2] = -2.0*sqrt(Q)*cos((theta-2.0*M_PI)/3.0) - a/3.0;
+      sol[1] = -2.0*sqrt(Q)*cos((theta+2.0*pigr)/3.0) - a/3.0;
+      sol[2] = -2.0*sqrt(Q)*cos((theta-2.0*pigr)/3.0) - a/3.0;
     }
   else
     {
