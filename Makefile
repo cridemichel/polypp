@@ -25,8 +25,10 @@ ifeq ($(shell echo $(HBPACK)|grep boost),)
   $(error Aborting...)
 endif
 endif
+ifneq ($(shell command -v brew 2> /dev/null),)
 ifeq ($(HBDIR),)
   HBDIR=$(shell brew --prefix)
+endif
 endif
 ifeq (,$(findstring intercept,$(CXX)))
   CXXHB=$(HBDIR)/bin/g++-9
@@ -37,12 +39,20 @@ ifeq (,$(findstring intercept,$(CXX)))
     CXX=g++
   endif
 endif
-HBLIBDIR=$(HBDIR)/lib 
-HBHDRDIR=$(HBDIR)/include # if PARALLEL is set to 1 parallelization through openmp is enabled,
+ifneq ($(HBDIR),)
+HBLIBS=-L $(HBDIR)/lib -lmpc -lmpfr -lgmp -lgmpxx
+HBHDRS=-I $(HBDIR)/include
+else
+HBLIBS=
+HBHDRS=
+endif
+# if PARALLEL is set to 1 parallelization through openmp is enabled,
 # but you have to use gnu gcc for this.
+ifeq ($(PARALLEL),)
 PARALLEL=0
-LIBS=-L $(HBLIBDIR) -lmpc -lmpfr -lgmp -lgmpxx
-CXXFLAGS= -Wall -std=c++17 -O3 -I $(HBHDRDIR) 
+endif
+LIBS=$(HBLIBS) 
+CXXFLAGS= -Wall -std=c++17 -O3 $(HBHDRS) 
 HEADERS=quartic.hpp pvector.hpp rpoly.hpp cpoly.hpp
 ifeq ($(PARALLEL),1)
   PARFLA=-fopenmp
