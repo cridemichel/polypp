@@ -1343,8 +1343,7 @@ public:
       // calculate initial guess using long double precision (much faster!)
       // MPSolve calculate the initial guess using double.
       // It is not recommended to set this to false if using multiple precision
-      // since in this case the initial guess becomes the bottleneck of the algorithm
-      // which slows down by a factor 3.
+      // since you will experience a slowing down by a factor 3.
       use_dbl_iniguess=true; 
     }
   cpoly()
