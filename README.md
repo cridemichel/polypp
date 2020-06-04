@@ -1,7 +1,7 @@
 **polypp**
 ===========
 
-A C++ class for solving complex and real polynomials of any degree in multiprecision.
+This is a C++ class for solving complex and real polynomials of any degree in multiprecision.
 Quadratic and cubic solver are based on Numerical Recipe book [1].
 Quartic solvers are implemented according to Ref. [2].
 Roots of polynomials of higher degree are found by using Aberth algorithm as discussed in Refs. [3-5].
