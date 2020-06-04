@@ -60,3 +60,26 @@ where:
 
 *degree*: degree of the polynomials.
 
+**Parallelization**
+
+Parallel calculation of roots is implemeneted through OpenMP (https://www.openmp.org/). 
+To enable the parallelization gnu gcc must be used and in the Makefile replace
+```makefile
+PARALLEL=0
+```
+with 
+```makefile
+PARALLEL=1
+```
+then issue the commands: 
+```shell
+> make clean
+> make
+```
+and to execute the timing test in parallel, do:
+```shell
+> export OMP_NUM_THREADS=4
+> time ./timingtest 1
+```
+where you can play with the number of threads by changing the value of the environment variable OMP_NUM_THREADES 
+and the degree of the polynomial used for the timing test by changing the macro NDEG in the file timingtest.cpp. Enjoy!
