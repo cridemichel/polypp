@@ -40,7 +40,7 @@ endif
 HBLIBDIR=$(HBDIR)/lib 
 HBHDRDIR=$(HBDIR)/include # if PARALLEL is set to 1 parallelization through openmp is enabled,
 # but you have to use gnu gcc for this.
-PARALLEL=1
+PARALLEL=0
 LIBS=-L $(HBLIBDIR) -lmpc -lmpfr -lgmp -lgmpxx
 CXXFLAGS= -Wall -std=c++17 -O3 -I $(HBHDRDIR) 
 HEADERS=quartic.hpp pvector.hpp rpoly.hpp cpoly.hpp
