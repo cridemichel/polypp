@@ -22,19 +22,19 @@ LDFLAGS=-lm -llapack -lblas $(BOOST_LIB) $(PARFLA)
 all: statanalysis poly_real poly_mp poly_cmplx timingtest
 
 poly_real: poly_real.cpp $(HEADERS)
-	poly_real.cpp $(CXX) $(CXXFLAGS) -o poly_real 
+	$(CXX) poly_real.cpp $(CXXFLAGS) -o poly_real 
 
 poly_cmplx: poly_cmplx.cpp $(HEADERS) 
-	poly_cmplx.cpp $(CXX) $(CXXFLAGS) $(LDFLAGS) -o poly_cmplx   
+	$(CXX) poly_cmplx.cpp $(CXXFLAGS) $(LDFLAGS) -o poly_cmplx   
 
 poly_mp: poly_mp.cpp $(HEADERS) 
-	poly_mp.cpp $(CXX) $(CXXFLAGS) $(LDFLAGS) -o poly_mp   
+	$(CXX) poly_mp.cpp $(CXXFLAGS) $(LDFLAGS) -o poly_mp   
 
 statanalysis: statanalysis.cpp $(HEADERS)
-	statanalysis.cpp $(CXX) $(CXXFLAGS) $(LDFLAGS) -o statanalysis 
+	$(CXX) statanalysis.cpp $(CXXFLAGS) $(LDFLAGS) -o statanalysis 
 
 timingtgest: timingtest.cpp $(HEADERS)
-	timingtest.cpp $(CXX) $(CXXFLAGS) $(LDFLAGS) -o timingtest 
+	$(CXX) timingtest.cpp $(CXXFLAGS) $(LDFLAGS) -o timingtest 
 
 clean:
 	rm -f timingtest poly_real poly_cmplx poly_mp statanalysis *.o
