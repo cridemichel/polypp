@@ -22,24 +22,17 @@ have been implemented as suggested in [6].
 ```
 In addition to header files you will find some .cpp files with examples on how to use this class.
 Multiprecision is implemented through boost multiprecision libraries (https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/index.html), hence you need to have both boost and gmp (https://gmplib.org/).
-
-Boost and gmp are provided by *boost* and *gmp* homebrew packages. Note that homebrew supports also linux (see https://brew.sh/).
-It is recommended to install also g++ (version 9.x) provided by boost and use it (the homebrew package is called gcc@9 and it will
+Boost and gmp are provided by *boost* and *gmp* homebrew packages (https://brew.sh/). Note that homebrew not only supports Mac OSX but also Linux and Windows (see https://docs.brew.sh/Homebrew-on-Linux).
+It is strongly recommended to install also g++ (version 9.x) provided by boost and use it (the homebrew package is called gcc@9 and it will
 provide the executable g++-9).
-If you installed boost and gmp through homebrew (https://brew.sh), the Makefile should work out of the box, i.e.
+
+If you installed boost, gmp and g++ through homebrew (https://brew.sh), the Makefile should work out of the box, i.e.
 by issuing the command:
 
 ```bash
 make all
 ```
-all the executables will be created. 
-If you installed boost and/or gmp not via homebrew or you use a non-standard brew installation directory, you can either
-change the directory related to your boost installation in the Makefile (HBDIR) before compiling, or 
-use the following command to compile the sources:
-
-```shell
-make HBDIR=<directory where boost is installed> 
-```
+the following executables will be created: 
 
 **poly_real**: example of usage of rpoly.hpp class for finding the roots of real polynomials.
 
