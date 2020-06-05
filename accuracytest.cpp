@@ -608,9 +608,9 @@ int main(int argc, char *argv[])
     {
       CASO = 1;
     }
-  if (CASO < 1 || CASO > 23)
+  if (CASO < 1 || CASO > 18)
     {
-      printf("Case must be between 1 and 23\n");
+      printf("Case must be between 1 and 18\n");
       exit(-1);
     }
   calc_coeff_dep_on_case(CASO);
