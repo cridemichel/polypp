@@ -49,7 +49,7 @@ the following executables will be created:
 **poly_cmplx**: example of usage of cpoly.hpp to find the roots of complex polynomials in  multiple precision (using boost).
 
 **statanalysis**: it performs some statistical analyses inspired by the ones which can be found in Ref. [2]. 
-The syntax is the following (where '>' is the shell prompt string):
+The syntax is the following:
 
 ```bash
 statanalysis <trials> <output> <sample> <degree>
