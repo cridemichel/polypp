@@ -1206,7 +1206,6 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
       cout << "That's not a quartic!\n";
       return;
     }
-
   a=coeff[3]/coeff[4];
   b=coeff[2]/coeff[4];
   c=coeff[1]/coeff[4];

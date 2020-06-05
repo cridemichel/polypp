@@ -43,9 +43,9 @@ int main(void)
 
   for (int i=0; i <= NDEG; i++)
     c[i] = mpreal("1.0");
+  //c << mpreal("1E-06"), mpreal("-1000000000.000000003"), mpreal("3000000.000000000003"), mpreal("-3000.000000000000001"), mpreal("1.0");
   P.set_coeff(c);
   P.find_roots(r);
-  //r.show("roots");
   int cc=0;
   for (auto& r0: r)
     {
