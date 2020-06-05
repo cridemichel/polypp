@@ -3,10 +3,10 @@ ifeq ($(shell which brew),)
   $(error Please install homebrew first!)
 endif
 # check if homebrew is installed 
-HBPACK=$(shell brew ls --versions gmp gcc@9 boost) 
+HBPACK=$(shell brew ls --versions gmp gcc boost) 
 ifeq ($(shell echo $(HBPACK)),)
-  $(warning Please install gmp, boost and gcc@9 homebrew packages through the command:)
-  $(warning > brew install gmp boost gcc@9)
+  $(warning Please install gmp, boost and gcc homebrew packages through the command:)
+  $(warning > brew install gmp boost gcc)
   $(error Aborting...)
 endif
 ifeq ($(shell echo $(HBPACK)|grep gmp),)
@@ -14,9 +14,9 @@ ifeq ($(shell echo $(HBPACK)|grep gmp),)
   $(warning > brew install gmp)
   $(error Aborting...)
 endif
-ifeq ($(shell echo $(HBPACK)|grep gcc | grep 9),)
+ifeq ($(shell echo $(HBPACK)|grep gcc,)
   $(warning Please install gcc homebrew packages through the command:)
-  $(warning > brew install gcc@9)
+  $(warning > brew install gcc)
   $(error Aborting...)
 endif
 ifeq ($(shell echo $(HBPACK)|grep boost),)
