@@ -83,7 +83,7 @@ where
 
 this program carries out several accuracy tests which can be found in Ref. [7]. The syntax is the following:
 
-> accuracytest <test_number>
+accuracytest <test_number>
 
 where
 
