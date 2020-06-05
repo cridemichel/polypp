@@ -73,8 +73,9 @@ where:
 
 this program performs a timing test of the polynomial solver. The syntax is the following:
 
+```bash
 time timingtest <trials>
-
+```
 where
 
 <trials> is the number of quartic equations to solve. 
@@ -83,7 +84,9 @@ where
 
 this program carries out several accuracy tests which can be found in Ref. [7]. The syntax is the following:
 
+```bash
 accuracytest <test_number>
+```
 
 where
 
