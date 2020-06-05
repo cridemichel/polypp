@@ -54,7 +54,7 @@ using pcmplx=complex<pdbl>;
 #endif
 //template <int N, int digits=200>
 //using rpolymp = rpoly<number<mpfr_float_backend<digits>>,N,false,number<mpc_complex_backend<digits>>>;
-#define Complex(x,y) cmplx((x),(y))
+#define Complex(x,y) cmplx("x","y"))
 bool allreal=false, doswap=false;
 #undef M_PI
 #define M_PI 3.1415926535897932384626433832795029L
@@ -106,6 +106,9 @@ void calc_coeff_dep_on_case(int CASO)
       //
       NDEG = 15;
       allreal=true;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       for (i=0; i < NDEG; i++)
         { 
           er[i] = i+1;
@@ -116,6 +119,9 @@ void calc_coeff_dep_on_case(int CASO)
     {
       NDEG = 20;
       allreal=true;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       for (i=0; i < NDEG; i++)
         { 
           er[i] = i+1;
@@ -126,6 +132,9 @@ void calc_coeff_dep_on_case(int CASO)
     {
       NDEG = 20;
       allreal=true;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       er[0] = vldbl(-2.1L);
       for (i=1; i < NDEG; i++)
         { 
@@ -136,6 +145,9 @@ void calc_coeff_dep_on_case(int CASO)
   else if (CASO==5)
     {
       NDEG = 10;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       allreal=true;
       for (i=1; i < NDEG+1; i++)
         { 
@@ -146,6 +158,9 @@ void calc_coeff_dep_on_case(int CASO)
   else if (CASO==6)
     {
       NDEG = 15;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       allreal=true;
       for (i=1; i < NDEG+1; i++)
         { 
@@ -156,6 +171,9 @@ void calc_coeff_dep_on_case(int CASO)
   else if (CASO==7)
     {
       NDEG = 20;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       allreal=true;
       for (i=1; i < NDEG+1; i++)
         { 
@@ -166,6 +184,9 @@ void calc_coeff_dep_on_case(int CASO)
   else if (CASO==8)
     {
       NDEG = 20;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+ 
       allreal=true;
       for (i=0; i < NDEG; i++)
         { 
@@ -177,6 +198,9 @@ void calc_coeff_dep_on_case(int CASO)
     {
       NDEG = 20;
       allreal=true;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       for (i=0; i < NDEG; i++)
         { 
           er[i] = 1.0L/pow(((vldbl)2),NDEG/2-i)-3.0L;
@@ -188,6 +212,9 @@ void calc_coeff_dep_on_case(int CASO)
       NDEG = 20;
       allreal=true;
       doswap=true;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       static complex<long double> erl[20]=
 
         {-0.98883082622512854506974288293400861L - 
@@ -238,6 +265,9 @@ void calc_coeff_dep_on_case(int CASO)
   else if (CASO==11)
     {
       NDEG = 20;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       static complex<long double> erl[20]=
         {-0.98883082622512854506974288293400861L- 
           0.14904226617617444692935471527721756L*1il, 
@@ -291,72 +321,45 @@ void calc_coeff_dep_on_case(int CASO)
       NDEG = 24;
       doswap=true;
       allreal=true;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
 
       static cmplx erl[24];
 
-      erl[0]=Complex(-3.52E2L, 0);
-      erl[1]=Complex(-3.52E2L, 0);
-      erl[2]=Complex(-2.8371450777E2L, -2.9920517772E2L);
-      erl[3]=Complex(-2.8371450777E2L,  2.9920517772E2L);
-      erl[4]=Complex(-2.7867414048E2L,  6.1005469197E2L);
-      erl[5]=Complex(-2.7867414048E2L, -6.1005469197E2L);
-      erl[6]=Complex(-2.74892372E2L, 0L);
-      erl[7]=Complex(-2.014171531E2L, 0L);
-      erl[8]=Complex(-1.255366582E2L, 0L);
-      erl[9]=Complex(-9.599999999E1L, 0L);
-      erl[10]=Complex(-8.8692435121E1L,  5.5009607430E2L);
-      erl[11]=Complex(-8.869243512E1L, -5.5009607430E2L);
-      erl[12]=Complex(-1.6000000000E1L, 0L);
-      erl[13]=Complex( 8.23178509855E1L, 0L);
-      erl[14]=Complex( 8.8692435121E1L, -5.50096074303E2L);
-      erl[15]=Complex( 8.8692435121E1L,  5.5009607430E2L);
-      erl[16]=Complex( 1.9293739373E2L,  1.60865921259E3L);
-      erl[17]=Complex( 1.929373937E2L, -1.6086592125E3L);
-      erl[18]=Complex( 2.0141715312E2L, 0L);
-      erl[19]=Complex( 2.7489237213E2L, 0L);
-      erl[20]=Complex( 7.52E2L, 0L);
-      erl[21]=Complex( 7.52E2L, 0L);
-      erl[22]=Complex( 9.1106065E2L,  1.5722L);
-      erl[23]=Complex( 9.1106065E2L, -1.5722L);
-      static vldbl cs[25];
-      cs[0]=-54765291428198020791747503747742749163073958404455022926495744.L;
-      cs[1]=-4052135566767965847649766745769409681058667331648450681896960.L;
-      cs[2]=-31969984081155943263834965670035075493639295858977076674560.L;
-      cs[3]=575060225471570237690073740639182419333523437771848417280.L;
-      cs[4]=7337981286595499156409929740830030318565357725459415040.L;
-      cs[5]=6611223380089859336490797585290455483968982077145088.L;
-      cs[6]=-195514288747757987122118583800597358656801082441728.L;
-      cs[7]=-726907419403715013562762609680450059293446635520.L;
-      cs[8]=197178719520196724204974332265013056299335680.L;
-      cs[9]=5968852409133617129605588058090797893943296.L;
-      cs[10]=16576506891508825500182005531742679597056.L;
-      cs[11]=23375026506968330494765978581548924928.L;
-      cs[12]=2206941937668751746514177591607296.L;
-      cs[13]=-75617855277818001758431020580864.L;
-      cs[14]=-204797687173976372829472423936.L;
-      cs[15]= -143150263927579584306872320.L;
-      cs[16]=  20214880144364480233472.L;
-      cs[17]=  453786251090072698880.L;
-      cs[18]=  1265052493274939392.L;
-      cs[19]= -968887355572224.L;
-      cs[20]=  1015406084096.L;
-      cs[21]= -3949133824.L;
-      cs[22]=  3284992.L;
-      cs[23]= -1728.L;
-
-      cs[24]=1.0L;
-
-      for (i=0; i < NDEG+1; i++)
-        {
-          c[i] = cs[i];
-        }
+      erl[0]=cmplx("-3.52E2","0");
+      erl[1]=cmplx("-3.52E2", "0");
+      erl[2]=cmplx("-2.8371450777E2", "-2.9920517772E2");
+      erl[3]=cmplx("-2.8371450777E2", "2.9920517772E2");
+      erl[4]=cmplx("-2.7867414048E2", "6.1005469197E2");
+      erl[5]=cmplx("-2.7867414048E2", "-6.1005469197E2");
+      erl[6]=cmplx("-2.74892372E2", "0");
+      erl[7]=cmplx("-2.014171531E2", "0");
+      erl[8]=cmplx("-1.255366582E2", "0");
+      erl[9]=cmplx("-9.599999999E1", "0");
+      erl[10]=cmplx("-8.8692435121E1", "5.5009607430E2");
+      erl[11]=cmplx("-8.8692435121E1", "-5.5009607430E2");
+      erl[12]=cmplx("-1.6000000000E1", "0");
+      erl[13]=cmplx("8.23178509855E1", "0");
+      erl[14]=cmplx("8.8692435121E1", "-5.50096074303E2");
+      erl[15]=cmplx("8.8692435121E1", "5.50096074303E2");
+      erl[16]=cmplx("1.9293739373E2", "1.60865921259E3");
+      erl[17]=cmplx("1.9293739373E2", "-1.60865921259E3");
+      erl[18]=cmplx("2.0141715312E2", "0");
+      erl[19]=cmplx("2.7489237213E2", "0");
+      erl[20]=cmplx("7.52E2", "0");
+      erl[21]=cmplx("7.52E2", "0");
+      erl[22]=cmplx("9.1106065E2", "1.5722");
+      erl[23]=cmplx("9.1106065E2", "-1.5722");
       for (i=0; i < NDEG; i++)
         er[i]=erl[i];
+      calc_coeff(c, er);
     }
-
   else if (CASO==13)
     {
       NDEG = 12;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       //roots and coefficients were calculated by Wolfram Mathematica with a precision of 1000 digits
       //print*, "Vanni Noferini's example degree 12 or 35"
       for ( i=0; i < NDEG; i++)
@@ -372,6 +375,9 @@ void calc_coeff_dep_on_case(int CASO)
     {
       // Noferini
       NDEG=35;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       //roots and coefficients were calculated by Wolfram Mathematica with a precision of 1000 digits
       //print*, "Vanni Noferini's example degree 12 or 35"
       for ( i=0; i < NDEG; i++)
@@ -387,6 +393,9 @@ void calc_coeff_dep_on_case(int CASO)
   else if (CASO==15)
     {
       NDEG = 10;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       allreal=true;
       er[0]=vldbl(0.1);
       for (i=1; i < NDEG; i++)
@@ -398,6 +407,9 @@ void calc_coeff_dep_on_case(int CASO)
   else if (CASO==16)
     {
       NDEG = 20;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+
       allreal=true;
       er[0]=vldbl(0.1);
       for (i=1; i < NDEG; i++)
@@ -409,6 +421,8 @@ void calc_coeff_dep_on_case(int CASO)
   else if (CASO==17)
     {
       NDEG = 60;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
 
       int ii;
       int m=15;
@@ -418,54 +432,24 @@ void calc_coeff_dep_on_case(int CASO)
       vldbl pi=M_PI;
 #endif
       for  (ii=-m+1; ii <= 0; ii++)
-        er[m-1+ii]= vldbl(0.9L)*exp(cmplx(0,vldbl(ii)*pi/vldbl(2.0L)/vldbl(m)));
+        er[m-1+ii]= vldbl("0.9")*exp(cmplx("0",vldbl(ii)*pi/vldbl("2.0")/vldbl(m)));
       for  (ii=1; ii <= m; ii++)
         er[m-1+ii] = conj(er[m-ii]);
       for  (ii=m+1; ii <= 2*m; ii++)
-        er[m-1+ii] = exp(cmplx(0,vldbl(ii)*pi/vldbl(2.0L)/vldbl(m)));
+        er[m-1+ii] = exp(cmplx(0,vldbl(ii)*pi/vldbl("2.0")/vldbl(m)));
       for  (ii=2*m+1; ii <= 3*m; ii++)
         er[m-1+ii] = conj(er[5*m-ii]);
       calc_coeff(c, er);
     }
   else if (CASO==18)
     {
-      //Polynomials with few very clustered roots.
-      //Kameny  
-      NDEG =  9;
-      numty K = 1E50;
-      for (auto i=0; i <= NDEG; i++)
-        c[i]=0.0;
-      c[0] = 9.0;
-      c[2] = -6.0*K*K;
-      c[4] = K*K*K*K;
-      c[9] = K*K; 
-    }
-  else if (CASO==19)
-    {
-      NDEG = 10;
-      for (auto i=0; i <= NDEG; i++)
-        c[i]=0.0;
-      c[NDEG] = 1.0;
-      c[0]=1.0;
-      c[1] = -300.0;
-      c[2] = 30000.0;
-      c[3] = -1E6;
-    }
-  else if (CASO==20)
-    {
-      NDEG = 11;
-      static numty ct[] ={-1E22, 2E21, -1E20, 0, 0, 0, 0, 0, 0, 0, 1.0};
-      for (i=0; i < 11; i++)
-        c[i] = ct[i]; 
-    }
-  else if (CASO==21)
-    {
       NDEG = 20;
-      static cmplx er[20];
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
       er[0]=1;
       for (i=1; i < NDEG; i++)
         { 
-          er[i] = er[i-1]/10.0L;
+          er[i] = er[i-1]/vldbl("10.0");
         }
       calc_coeff(c, er);
     }
