@@ -71,7 +71,7 @@ where:
 
 **timingtest**:
 
-this program performs a timing test of the polynomial solver. The syntax is the following (where '>' is the shell prompt string):
+this program performs a timing test of the polynomial solver. The syntax is the following:
 
 time timingtest <trials>
 
@@ -81,7 +81,7 @@ where
 	
 **accuracytest**: 
 
-this program carries out several accuracy tests which can be found in Ref. [7]. The syntax is the following (where '>' is the shell prompt string):
+this program carries out several accuracy tests which can be found in Ref. [7]. The syntax is the following:
 
 > accuracytest <test_number>
 
