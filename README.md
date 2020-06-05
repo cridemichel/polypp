@@ -90,7 +90,7 @@ this program carries out several accuracy tests which can be found in Ref. [7]. 
 
 where
 
-<test_number> is a number between 1 and 18 which identified the test to perform (see the sources to recognize the different tests)
+<test_number> is a number between 1 and 18 which identifies the test to perform (see the sources to recognize the different tests)
 
 **Parallelization**
 
