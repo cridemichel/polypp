@@ -52,7 +52,7 @@ the following executables will be created:
 The syntax is the following (where '>' is the shell prompt string):
 
 ```bash
-> statanalysis <trials> <output> <sample> <degree>
+statanalysis <trials> <output> <sample> <degree>
 ```
 
 where:
@@ -73,7 +73,7 @@ where:
 
 this program performs a timing test of the polynomial solver. The syntax is the following (where '>' is the shell prompt string):
 
-> time timingtest <trials>
+time timingtest <trials>
 
 where
 
