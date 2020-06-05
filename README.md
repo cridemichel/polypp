@@ -18,6 +18,7 @@ have been implemented as suggested in [6].
 [4] D. A. Bini and G. Fiorentino, Numerical Algorithms 23, 127–173 (2000).
 [5] D. A. Bini and L. Robol, J. Comp. and Appl. Mat. 272, 276-292 (2014).
 [6] T. R. Cameron, Numerical Algorithms, 82, 1065–1084 (2019), doi: https://doi.org/10.1007/s11075-018-0641-9
+[7] J. L. Aurentz et al., Siam J. Matrix Anal. Appl., 36, 3 942–973 (2015).
 ```
 
 In addition to header files you will find some .cpp files with examples on how to use this class, a tool for a statistical analysis of solver accuracy (statanalysis) and another one for testing its performance (timingtest).
@@ -77,6 +78,16 @@ this program performs a timing test of the polynomial solver. The syntax is the 
 where
 
 <trials> is the number of quartic equations to solve. 
+	
+**accuracytest**: 
+
+this program carries out several accuracy tests which can be found in Ref. [7]. The syntax is the following (where '>' is the shell prompt string):
+
+> accuracytest <test_number>
+
+where
+
+<test_number> is a number between 1 and 18 which identified the test to perform (see the sources to recognize the different tests)
 
 **Parallelization**
 
