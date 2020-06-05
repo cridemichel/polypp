@@ -1,5 +1,7 @@
+BREWINST=.brew_packages_installed_
 ifneq ($(MAKECMDGOALS),poly_real)
-ifeq ($(shell which brew),)
+ifeq ("$(wildcard $(BREWINST))","")
+ifeq ($(shell command -v brew 2> /dev/null),)
   $(error Please install homebrew first!)
 endif
 # check if homebrew is installed 
@@ -13,16 +15,34 @@ ifeq ($(shell echo $(HBPACK)|grep gmp),)
   $(warning Please install gmp homebrew packages through the command:)
   $(warning > brew install gmp)
   $(error Aborting...)
+  GMPPAK=0
+else	
+  GMPPAK=1
 endif
-ifeq ($(shell echo $(HBPACK)|grep gcc,)
+ifeq ($(shell echo $(HBPACK)|grep gcc),)
   $(warning Please install gcc homebrew packages through the command:)
   $(warning > brew install gcc)
   $(error Aborting...)
+  GCCPAK=0
+else	
+  $(shell CC=$[$CC+1])
+  GCCPAK=1
 endif
 ifeq ($(shell echo $(HBPACK)|grep boost),)
   $(warning Please install boost homebrew packages through the command:)
   $(warning > brew install boost)
   $(error Aborting...)
+  BOOSTPAK=0
+else
+  BOOSTPAK=1
+endif
+ifeq ($(GMPPAK),1)
+  ifeq ($(GCCPAK),1)
+    ifeq ($(BOOSTPAK),1) 
+      $(shell touch $(BREWINST))
+    endif
+  endif
+endif
 endif
 endif
 ifneq ($(shell command -v brew 2> /dev/null),)
@@ -31,7 +51,7 @@ ifeq ($(HBDIR),)
 endif
 endif
 ifeq (,$(findstring intercept,$(CXX)))
-  CXXHB=$(HBDIR)/bin/g++-9
+  CXXHB=g++-9
   #check if g++-9 exists
   ifneq ("$(wildcard $(HBDIR))","")
     CXX=$(CXXHB)
@@ -80,4 +100,4 @@ timingtest: timingtest.cpp $(HEADERS)
 	$(CXX) timingtest.cpp $(CXXFLAGSMP) $(LDFLAGS) -o timingtest 
 
 clean:
-	rm -f timingtest poly_real poly_cmplx poly_mp statanalysis *.o
+	rm -f timingtest poly_real poly_cmplx poly_mp statanalysis *.o $(BREWINST)
