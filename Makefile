@@ -82,7 +82,7 @@ else
 endif 
 LDFLAGS=-lm $(LIBS) $(PARFLA)
 
-all: statanalysis poly_real poly_mp poly_cmplx timingtest
+all: statanalysis poly_real poly_mp poly_cmplx timingtest accuracytest
 
 poly_real: poly_real.cpp $(HEADERS)
 	$(CXX) poly_real.cpp $(CXXFLAGS) -o poly_real 
@@ -99,5 +99,7 @@ statanalysis: statanalysis.cpp $(HEADERS)
 timingtest: timingtest.cpp $(HEADERS)
 	$(CXX) timingtest.cpp $(CXXFLAGSMP) $(LDFLAGS) -o timingtest 
 
+accuracytest: accuracytest.cpp $(HEADERS)
+	$(CXX) accuracytest.cpp $(CXXFLAGSMP) $(LDFLAGS) -o accuracytest 
 clean:
-	rm -f timingtest poly_real poly_cmplx poly_mp statanalysis *.o $(BREWINST)
+	rm -f timingtest poly_real poly_cmplx poly_mp statanalysis accuracytest *.o $(BREWINST)

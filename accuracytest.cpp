@@ -367,7 +367,7 @@ void calc_coeff_dep_on_case(vldbl c[], cmplx er[], int CASO)
 
       calc_coeff(c, er);
     }
-  else if (CASO==16)
+  else if (CASO==14)
     {
       // Noferini
       NDEG=35;
@@ -383,7 +383,7 @@ void calc_coeff_dep_on_case(vldbl c[], cmplx er[], int CASO)
       calc_coeff(c, er);
 
     }
-  else if (CASO==17)
+  else if (CASO==15)
     {
       NDEG = 10;
       allreal=true;
@@ -394,7 +394,7 @@ void calc_coeff_dep_on_case(vldbl c[], cmplx er[], int CASO)
         }
       calc_coeff(c, er);
     }
-  else if (CASO==18)
+  else if (CASO==16)
     {
       NDEG = 20;
       allreal=true;
@@ -405,7 +405,7 @@ void calc_coeff_dep_on_case(vldbl c[], cmplx er[], int CASO)
         }
       calc_coeff(c, er);
     }
-  else if (CASO==19)
+  else if (CASO==17)
     {
       NDEG = 60;
 
@@ -426,7 +426,7 @@ void calc_coeff_dep_on_case(vldbl c[], cmplx er[], int CASO)
         er[m-1+ii] = conj(er[5*m-ii]);
       calc_coeff(c, er);
     }
-  else if (CASO==20)
+  else if (CASO==18)
     {
       //Polynomials with few very clustered roots.
       //Kameny  
@@ -439,7 +439,7 @@ void calc_coeff_dep_on_case(vldbl c[], cmplx er[], int CASO)
       c[4] = K*K*K*K;
       c[9] = K*K; 
     }
-  else if (CASO==21)
+  else if (CASO==19)
     {
       NDEG = 10;
       for (auto i=0; i <= NDEG; i++)
@@ -450,14 +450,14 @@ void calc_coeff_dep_on_case(vldbl c[], cmplx er[], int CASO)
       c[2] = 30000.0;
       c[3] = -1E6;
     }
-  else if (CASO==22)
+  else if (CASO==20)
     {
       NDEG = 11;
       static numty ct[] ={-1E22, 2E21, -1E20, 0, 0, 0, 0, 0, 0, 0, 1.0};
       for (i=0; i < 11; i++)
         c[i] = ct[i]; 
     }
-  else if (CASO==23)
+  else if (CASO==21)
     {
       NDEG = 20;
       static cmplx er[20];
@@ -476,7 +476,7 @@ int factorial(int n)
 }
 void sort_sol_opt(cmplx csol[], cmplx exsol[], vldbl allrelerr[])
 {
-  int k1, k2, k2min;
+  int k1, k2, k2min=0;
   int perm[NDEG];
   vldbl relerr, relerrmin, relerrmax;
   cmplx diff, solt[NDEG];
@@ -606,7 +606,7 @@ void calc_coeff(vldbl co[], cmplx er[])
 int main(int argc, char *argv[])
 {
   char testo2[256];
-  numty *ca;
+  numty *ca=NULL;
   int i, CASO;
 
   if (argc == 2)
@@ -648,7 +648,6 @@ int main(int argc, char *argv[])
   rp.set_coeff(c);
   rp.show("poly");
   rp.find_roots(roots);
-  cout << "ROOT=" << rp.evalpoly(roots[23]) << "\n";
   sprintf(testo2, "OPS");
   for (i=0; i < NDEG; i++)
     cr[i] = cmplx(roots[i]);
