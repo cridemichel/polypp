@@ -7,7 +7,7 @@
 #include "./rpoly.hpp"
 #endif
 #include <complex>
-#define WP 100
+#define WP 200
 #define MPC_MP
 //#define GMP_MP
 //#define CPP_MP
@@ -203,9 +203,7 @@ int main(int argc, char **argv)
   long long int numtrials, its=0, numout, itsI;
   int numpts, ilogdE;
   int k, i;
-  pvector<pcmplx,-1> csold(NDEG);
-  pvector<pdbl,-1> cod(NDEG+1);
-#ifdef CPOLY
+ #ifdef CPOLY
   cpoly<pcmplx,-1,pdbl> oqs;
 #else
   rpoly<pdbl,-1,pcmplx> oqs;
@@ -236,6 +234,9 @@ int main(int argc, char **argv)
     cmplxreal = atoi(argv[3]);
   if (argc >= 5)
     NDEG=atoi(argv[4]);
+ 
+  pvector<pcmplx,-1> csold(NDEG);
+  pvector<pdbl,-1> cod(NDEG+1);
 
   co.allocate(NDEG+1);
   csol.allocate(NDEG);
@@ -243,9 +244,9 @@ int main(int argc, char **argv)
   oqs.allocate(NDEG);
   csolall.allocate(NDEG);
   allrelerr = new vldbl[NDEG];
-  if (cmplxreal < 0 || cmplxreal > 4)
+  if (cmplxreal < 0 || cmplxreal > 5)
     {
-      printf("cmplxreal must be between 0 and 4!\n");
+      printf("cmplxreal must be between 0 and 5!\n");
       exit(-1);
     }
   if (cmplxreal==3)
@@ -285,9 +286,9 @@ int main(int argc, char **argv)
 	    printf("[SAMPLE D sig=%G %G]>>> its=%lld/%lld\n", double(sig), double(sig2), its, numtrials);
 	  else if (cmplxreal==4)
             printf("[SAMPLE E sig=%G %G]>>> its=%lld/%lld\n", double(sig), double(sig2), its, numtrials);
-#if 0
+#if 1
           else if (cmplxreal==5)
-            printf("[SAMPLE F sig=%G %G]>>> its=%lld/%lld\n", double(sig), double(sig2), its, numtrials);
+            printf("[SAMPLE F multiple roots]>>> its=%lld/%lld\n", its, numtrials);
 #endif
           save_PE(its, numpts, dlogdE, logdEmin);
 	}
@@ -326,12 +327,18 @@ int main(int argc, char **argv)
           for (i=0; i < NDEG; i++)
             exsol[i] = cmplx(sig*(ranf()-0.5),0.0);
 	}
+      else if (cmplxreal==5)
+        {
+          /* clustered NDEG-1 roots and one isolated root */
+          for (i=0; i < NDEG-1; i++)
+            exsol[i] = cmplx(1000.0+1E-3*sig*(ranf()-0.5),"0.0");
+          exsol[NDEG-1] = cmplx(pow(2.0,-48),"0.0");
+        }
       calc_coeff(co, exsol);
-      
       for (i=0; i <= NDEG; i++)
         cod[i] = co[i];
       oqs.set_coeff(cod);
-      //cout << "QUI\n";
+      //exsol.show("exroots");
       oqs.find_roots(csold);
       for (i=0; i < NDEG; i++)
         csolall[i] = csold[i];

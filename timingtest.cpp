@@ -8,6 +8,7 @@
 #include "./rpoly.hpp"
 #endif
 #define WP 100
+#define WPD 20
 #define WPBS 200
 //#define MPC_MP
 #define GMP_MP
@@ -19,6 +20,8 @@ using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
 using numty = number<cpp_bin_float<WP>>;
 using cmplx = cpp_complex<WP>;
+using dntype= number<cpp_bin_float<WPD>>;
+using dcmplx= cpp_complex<WPD>;
 #elif defined(GMP_MP)
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/complex_adaptor.hpp>
@@ -27,6 +30,8 @@ using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
 using numty=number<gmp_float<WP>>;
 using cmplx=number<complex_adaptor<gmp_float<WP>>>;
+using dntype=number<gmp_float<WPD>>;
+using dcmplx=number<complex_adaptor<gmp_float<WPD>>>;
 #ifdef BACKSTAB
 using bsdbl=number<gmp_float<WPBS>>;
 using bscmplx=number<complex_adaptor<gmp_float<WPBS>>>;
@@ -39,6 +44,8 @@ using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
 using numty=number<mpfr_float_backend<WP>>;
 using cmplx=number<mpc_complex_backend<WP>>;
+using dntype=number<mpfr_float_backend<WPD>>;
+using dcmplx=number<mpc_complex_backend<WPD>>;
 #ifdef BACKSTAB
 using bsdbl=number<mpfr_float_backend<WPBS>>;
 using bscmplx=number<mpc_complex_backend<BS>>;
@@ -50,8 +57,9 @@ using bscmplx=number<mpc_complex_backend<WPBS>>;
 #endif
 using numty=double;
 using cmplx=complex<numty>;
+using dntype=numty;
+using dcmplx=cmplx;
 #endif
-
 //#include<complex>
 #ifndef NDEG
 #define NDEG 1000
@@ -229,7 +237,6 @@ int main(int argc, char* argv[])
   pvector<cmplx,NDEG> roots;
 #else
   rpoly<numty,NDEG,cmplx> rp;
-  rpoly<numty,NDEG,cmplx> rphqr;
   pvector<numty,NDEG+1> c;
   pvector<cmplx,NDEG> roots;
 #endif

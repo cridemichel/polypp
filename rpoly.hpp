@@ -19,7 +19,7 @@ template<class T>
 inline const T MAX(const T &a, const T &b)
         {return b > a ? (b) : (a);}
 
-template <class ntype, int N, class cmplx> 
+template <class ntype, int N, class cmplx, class dcmplx, class dntype> 
 class rpoly_base_static 
 {
 public:
@@ -27,7 +27,7 @@ public:
   constexpr static int dynamic = false;
   pvector<ntype, N+1> coeff;
   pvector<ntype, N+1> cmon;
-  cpoly<cmplx,N,ntype> cpol;
+  cpoly<cmplx,N,ntype,dcmplx,dntype> cpol;
   quartic<ntype,cmplx,false> quar;
 
   void set_coeff(pvector<ntype,N+1> v)
@@ -49,7 +49,7 @@ public:
     n=nc;
   }
 };
-template <class ntype, int N, class cmplx> 
+template <class ntype, int N, class cmplx, class dcmplx, class dntype> 
 class rpoly_base_dynamic 
 {
 public:
@@ -57,7 +57,7 @@ public:
   constexpr static int dynamic = true;
   pvector<ntype> coeff;
   pvector<ntype> cmon;
-  cpoly<cmplx,-1,ntype> cpol;
+  cpoly<cmplx,-1,ntype, dcmplx, dntype> cpol;
   quartic<ntype,cmplx,true> quar;
 
   rpoly_base_dynamic() = default;
@@ -98,17 +98,17 @@ public:
     }
 };
 
-template <class ntype, int N, class cmplx> using rpolybase = 
-typename std::conditional<(N>0), rpoly_base_static <ntype, N, cmplx>,
-	 rpoly_base_dynamic <ntype, N, cmplx>>::type;
+template <class ntype, int N, class cmplx, class dcmplx, class dntype> using rpolybase = 
+typename std::conditional<(N>0), rpoly_base_static <ntype, N, cmplx, dcmplx, dntype>,
+	 rpoly_base_dynamic <ntype, N, cmplx, dcmplx, dntype>>::type;
  
-template <class ntype, int N=-1, class cmplx=complex<ntype>> 
-class rpoly: public numeric_limits<ntype>, public rpolybase<ntype,N, cmplx> {
-  using rpolybase<ntype,N,cmplx>::n;
-  using rpolybase<ntype,N,cmplx>::coeff;
-  using rpolybase<ntype,N,cmplx>::cmon;
-  using rpolybase<ntype,N,cmplx>::cpol;
-  using rpolybase<ntype,N,cmplx>::quar;
+template <class ntype, int N=-1, class cmplx=complex<ntype>, class dcmplx=complex<long double>, class dntype=long double> 
+class rpoly: public numeric_limits<ntype>, public rpolybase<ntype,N, cmplx, dcmplx, dntype> {
+  using rpolybase<ntype,N,cmplx,dcmplx,dntype>::n;
+  using rpolybase<ntype,N,cmplx,dcmplx,dntype>::coeff;
+  using rpolybase<ntype,N,cmplx,dcmplx,dntype>::cmon;
+  using rpolybase<ntype,N,cmplx,dcmplx,dntype>::cpol;
+  using rpolybase<ntype,N,cmplx,dcmplx,dntype>::quar;
 
   const ntype pigr=acos(ntype(-1.0));
   const cmplx I = cmplx(0.0,1.0);
@@ -366,18 +366,19 @@ public:
     {
       return goaleps;
     } 
-  rpoly(): rpolybase<ntype,N,cmplx>()
+  rpoly(): rpolybase<ntype,N,cmplx,dcmplx,dntype>()
     {
       init_const();
     }
 
-  rpoly(int nc): rpolybase<ntype,N,cmplx>(nc)
+  rpoly(int nc): rpolybase<ntype,N,cmplx,dcmplx,dntype>(nc)
     {
       init_const(); 
     }
 };
 // quadratic equation
-template<class ntype, int N, class cmplx> void rpoly<ntype,N,cmplx>::solve_quadratic(pvector<cmplx,N>&sol)
+template<class ntype, int N, class cmplx, class dcmplx, class dntype> 
+void rpoly<ntype,N,cmplx,dcmplx,dntype>::solve_quadratic(pvector<cmplx,N>&sol)
 {
   cmplx r[2];
   ntype a,b;
@@ -388,7 +389,8 @@ template<class ntype, int N, class cmplx> void rpoly<ntype,N,cmplx>::solve_quadr
   sol[1] = r[1];
 }
 // cubic polynomial
-template <class ntype, int N, class cmplx> void rpoly<ntype,N, cmplx>::solve_cubic_analytic(pvector<cmplx,N>& sol)
+template<class ntype, int N, class cmplx, class dcmplx, class dntype> 
+void rpoly<ntype,N, cmplx,dcmplx, dntype>::solve_cubic_analytic(pvector<cmplx,N>& sol)
 {
   /* solve the cubic coeff[3]*x^3 + coeff[2]*x^2 +  coeff[1]*x + coeff[0] = 0
    * according to the method described in Numerical Recipe book */  
@@ -423,7 +425,9 @@ template <class ntype, int N, class cmplx> void rpoly<ntype,N, cmplx>::solve_cub
     }
 }
 
-template <class ntype, int N, class cmplx> void  rpoly<ntype,N, cmplx>::oqs_solve_quadratic(ntype a, ntype b, cmplx roots[2])
+
+template<class ntype, int N, class cmplx, class dcmplx, class dntype> 
+void  rpoly<ntype,N, cmplx, dcmplx, dntype>::oqs_solve_quadratic(ntype a, ntype b, cmplx roots[2])
 { 
   ntype div,sqrtd,diskr,zmax,zmin;
   diskr=a*a-4*b;   
