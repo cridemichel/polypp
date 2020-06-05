@@ -11,7 +11,8 @@
 #include<string>
 #include <iomanip>
 using namespace std;
-#define MPC_MP
+//#define MPC_MP
+#define GMP_MP
 #ifdef CPP_MP
 #define WP 200
 #include <boost/multiprecision/cpp_bin_float.hpp> 
@@ -31,7 +32,7 @@ using namespace boost;
 using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
 using vldbl=number<gmp_float<WP>>;
-using cmplx=number<complex_adaptor<vldbl>>;
+using cmplx=number<complex_adaptor<gmp_float<WP>>>;
 using pdbl=vldbl;
 using pcmplx=cmplx;
 #elif defined(MPC_MP)
