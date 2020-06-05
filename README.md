@@ -3,7 +3,7 @@
 
 This project provides two C++ classes (*rpoly.hpp* and *cpoly.hpp*) for solving complex and real polynomials of any degree in multiprecision. Quadratic and cubic solver are based on Numerical Recipe book [1].
 Quartic solvers are implemented according to Ref. [2].
-Roots of polynomials of higher degree are found by using Aberth algorithm as discussed in Refs. [3-5].
+Roots of polynomials of higher degree are found by using Ehrlich–Aberth algorithm as discussed in Refs. [3-5].
 Stopping criterion and accurate calculation of correction term in Aberth method 
 have been implemented as suggested in [6].
 
