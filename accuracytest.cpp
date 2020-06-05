@@ -59,6 +59,7 @@ bool allreal=false, doswap=false;
 #undef M_PI
 #define M_PI 3.1415926535897932384626433832795029L
 using numty = vldbl;
+vldbl *c;
 cmplx *er;
 void calc_coeff(vldbl c[], cmplx er[]);
 numty gauss(void)
@@ -82,7 +83,7 @@ numty gauss(void)
 
 }
 int NDEG=0;
-void calc_coeff_dep_on_case(vldbl c[], cmplx er[], int CASO)
+void calc_coeff_dep_on_case(int CASO)
 {
   int i;
   if (CASO==1)
@@ -548,9 +549,12 @@ void print( list<int> l){
 
 void calc_coeff(vldbl co[], cmplx er[])
 {
-  vldbl rr[NDEG], ir[NDEG], c[NDEG+1], alpha, beta, zero;
+  vldbl alpha, beta, zero;
   int ii, jj;
-
+  vldbl *rr, *ir, *c;
+  rr = new vldbl[NDEG];
+  ir = new vldbl[NDEG];
+  c = new vldbl[NDEG+1];
   zero = 0.0;
   for (ii=0; ii < NDEG; ii++)
     {
@@ -601,12 +605,14 @@ void calc_coeff(vldbl co[], cmplx er[])
   for (ii=0; ii < NDEG; ii++)
      co[ii] = c[NDEG-ii-1];
   co[NDEG]=1.0;
+  delete [] ir;
+  delete [] rr;
+  delete [] c;
 }
 
 int main(int argc, char *argv[])
 {
   char testo2[256];
-  numty *ca=NULL;
   int i, CASO;
 
   if (argc == 2)
@@ -622,30 +628,29 @@ int main(int argc, char *argv[])
       printf("Case must be between 1 and 23\n");
       exit(-1);
     }
-  calc_coeff_dep_on_case(ca, er, CASO);
+  calc_coeff_dep_on_case(CASO);
 
+  cout << "NDEG=" << NDEG << "\n";
   pvector<cmplx> roots(NDEG);
   cmplx* cr = new cmplx[NDEG];
-#ifdef CPOLY
-  pvector<cmplx> c(NDEG+1);
-#else
-  pvector<pdbl> c(NDEG+1);
-#endif
   numty *allrelerr= new numty[NDEG];
   srand48(0);
+
 #ifdef CPOLY
+  pvector<cmplx> ca(NDEG+1);
   for (i=0; i < NDEG+1; i++)
-    c[i]=cmplx(vldbl(ca[i]),0.0);
+    ca[i]=cmplx(vldbl(c[i]),0.0);
 #else
+  pvector<pdbl> ca(NDEG+1);
   for (i=0; i < NDEG+1; i++)
-    c[i]=pdbl(ca[i]);
+    ca[i]=pdbl(c[i]);
 #endif
 #ifdef CPOLY
   cpoly<cmplx,-1,vldbl> rp(NDEG);
 #else
   rpoly<pdbl,-1,false,pcmplx> rp(NDEG);
 #endif
-  rp.set_coeff(c);
+  rp.set_coeff(ca);
   rp.show("poly");
   rp.find_roots(roots);
   sprintf(testo2, "OPS");
