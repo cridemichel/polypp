@@ -52,7 +52,7 @@ the following executables will be created:
 The syntax is the following:
 
 ```bash
-statanalysis <trials> <output> <sample> <degree>
+./statanalysis <trials> <output> <sample> <degree>
 ```
 
 where:
@@ -74,7 +74,7 @@ where:
 this program performs a timing test of the polynomial solver. The syntax is the following:
 
 ```bash
-time timingtest <trials>
+time ./timingtest <trials>
 ```
 where
 
@@ -85,7 +85,7 @@ where
 this program carries out several accuracy tests which can be found in Ref. [7]. The syntax is the following:
 
 ```bash
-accuracytest <test_number>
+./accuracytest <test_number>
 ```
 
 where
