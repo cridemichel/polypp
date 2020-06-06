@@ -79,6 +79,9 @@ time ./timingtest <trials>
 where
 
 <trials> is the number of quartic equations to solve. 
+
+By default a polynomial of degree 1000 with random real coefficients between -0.5 and 0.5 is used.
+The degree of the polynomial can be changed through the macro NDEG defined in timingtest.cpp.
 	
 **accuracytest**: 
 
