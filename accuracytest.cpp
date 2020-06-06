@@ -7,14 +7,17 @@
 #include "./rpoly.hpp"
 #endif
 #include<complex>
+#include<iostream>
+#include<fstream>
 #include<list>
 #include<string>
 #include <iomanip>
 using namespace std;
 //#define MPC_MP
 #define GMP_MP
-#ifdef CPP_MP
 #define WP 200
+#define WPP 200
+#ifdef CPP_MP
 #include <boost/multiprecision/cpp_bin_float.hpp> 
 #include <boost/multiprecision/cpp_complex.hpp>
 using namespace boost;
@@ -22,10 +25,9 @@ using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
 using vldbl = number<cpp_bin_float<WP>>;
 using cmplx = cpp_complex<WP>;
-using pdbl=vldbl;
-using pcmplx=cmplx;
+using pdbl=number<cpp_bin_float<WPP>>;
+using pcmplx=cpp_complex<WPP>;
 #elif defined(GMP_MP)
-#define WP 200
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/multiprecision/complex_adaptor.hpp>
 using namespace boost;
@@ -33,10 +35,9 @@ using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
 using vldbl=number<gmp_float<WP>>;
 using cmplx=number<complex_adaptor<gmp_float<WP>>>;
-using pdbl=vldbl;
-using pcmplx=cmplx;
+using pdbl=number<gmp_float<WPP>>;
+using pcmplx=number<complex_adaptor<gmp_float<WPP>>>;
 #elif defined(MPC_MP)
-#define WP 200
 #include <boost/multiprecision/mpc.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 using namespace boost;
@@ -44,8 +45,8 @@ using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
 using vldbl=number<mpfr_float_backend<WP>>;
 using cmplx=number<mpc_complex_backend<WP>>;
-using pdbl=double;//number<mpfr_float_backend<50>>;//=double;
-using pcmplx=complex<double>;//number<mpc_complex_backend<50>>;//complex<double>;
+using pdbl=number<mpfr_float_backend<WPP>>;
+using pcmplx=number<mpc_complex_backend<WPP>>;
 #else
 using vldbl=long double;
 using cmplx=complex<vldbl>;
@@ -59,6 +60,7 @@ using pcmplx=complex<pdbl>;
 bool allreal=false, doswap=false;
 #undef M_PI
 #define M_PI 3.1415926535897932384626433832795029L
+//#define PRINTOUT_COEFF
 using numty = vldbl;
 vldbl *c;
 cmplx *er;
@@ -427,11 +429,7 @@ void calc_coeff_dep_on_case(int CASO)
 
       int ii;
       int m=15;
-#ifdef MPC_MP
-      vldbl pi = boost::math::constants::pi<vldbl>();//2.0*acos(vldbl(0.0));
-#else
-      vldbl pi=M_PI;
-#endif
+      vldbl pi = 2.0*acos(vldbl(0.0));
       for  (ii=-m+1; ii <= 0; ii++)
         er[m-1+ii]= vldbl("0.9")*exp(cmplx("0",vldbl(ii)*pi/vldbl("2.0")/vldbl(m)));
       for  (ii=1; ii <= m; ii++)
@@ -590,6 +588,13 @@ void calc_coeff(vldbl co[], cmplx er[])
   for (ii=0; ii < NDEG; ii++)
      co[ii] = c[NDEG-ii-1];
   co[NDEG]=1.0;
+#ifdef PRINTOUT_COEFF
+  fstream f;
+  f.open("coeff.dat", ios::out|ios::trunc);
+  for (ii=0; ii < NDEG+1; ii++)
+    f << setprecision(WP) << co[ii] << "\n";
+  f.close();
+#endif
   delete [] ir;
   delete [] rr;
   delete [] c;
@@ -616,22 +621,22 @@ int main(int argc, char *argv[])
   calc_coeff_dep_on_case(CASO);
 
   cout << "NDEG=" << NDEG << "\n";
-  pvector<cmplx> roots(NDEG);
+  pvector<pcmplx> roots(NDEG);
   cmplx* cr = new cmplx[NDEG];
   numty *allrelerr= new numty[NDEG];
   srand48(0);
 
 #ifdef CPOLY
-  pvector<cmplx> ca(NDEG+1);
+  pvector<pcmplx> ca(NDEG+1);
   for (i=0; i < NDEG+1; i++)
-    ca[i]=cmplx(vldbl(c[i]),0.0);
+    ca[i]=pcmplx(vldbl(c[i]),0.0);
 #else
   pvector<pdbl> ca(NDEG+1);
   for (i=0; i < NDEG+1; i++)
     ca[i]=pdbl(c[i]);
 #endif
 #ifdef CPOLY
-  cpoly<cmplx,-1,vldbl> rp(NDEG);
+  cpoly<pcmplx,-1,pdbl> rp(NDEG);
 #else
   rpoly<pdbl,-1,false,pcmplx> rp(NDEG);
 #endif
