@@ -8,7 +8,7 @@
 #endif
 #include <complex>
 #define WP 200
-#define MPC_MP
+//#define MPC_MP
 //#define GMP_MP
 //#define CPP_MP
 #ifdef CPP_MP
@@ -112,7 +112,7 @@ void sort_sol_opt(pvector<pcmplx,-1>& csol, pvector<cmplx,-1>& exsol, vldbl allr
 {
   int k1, k2, k2min=0;
   int *perm;
-  vldbl relerr, relerrmin;
+  vldbl relerr, relerrmin=0.0;
   cmplx diff, *solt;
   bool *used_exsol;
 
@@ -331,8 +331,8 @@ int main(int argc, char **argv)
         {
           /* clustered NDEG-1 roots and one isolated root */
           for (i=0; i < NDEG-1; i++)
-            exsol[i] = cmplx(1000.0+1E-3*sig*(ranf()-0.5),"0.0");
-          exsol[NDEG-1] = cmplx(pow(2.0,-48),"0.0");
+            exsol[i] = cmplx(1000.0+1E-3*sig*(ranf()-0.5),0.0);
+          exsol[NDEG-1] = cmplx(pow(2.0,-48),0.0);
         }
       calc_coeff(co, exsol);
       for (i=0; i <= NDEG; i++)
