@@ -13,8 +13,8 @@
 #include<string>
 #include <iomanip>
 using namespace std;
-//#define MPC_MP
-#define GMP_MP
+#define MPC_MP
+//#define GMP_MP
 #define WP 200
 #define WPP 200
 #ifdef CPP_MP

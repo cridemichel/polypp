@@ -150,7 +150,7 @@ public:
       n=nc;
     }
 
-  cpoly_base_dynamic(int nc): coeff(nc+1), cmon(nc+1), acmon(nc+1), alpha(nc+1), droots(nc)
+  cpoly_base_dynamic(int nc): coeff(nc+1), cmon(nc+1), acmon(nc+1), alpha(nc+1), droots(nc), errb(nc)
   {
 #ifdef USE_ROLD
     rold.allocate(nc);
@@ -1389,7 +1389,7 @@ public:
       maxf= getmax();
       minf = numeric_limits<ntype>::min();
       maxdigits =(numeric_limits<ntype>::digits10)-1;
-      cout << "numeric digits=" << maxdigits << " meps=" << meps << "\n";
+      //cout << "numeric digits=" << maxdigits << " meps=" << meps << "\n";
 
       maxf2 = pow(maxf,0.5)/10.0;
       maxf3 = pow(maxf,1.0/3.0)/10.0;
