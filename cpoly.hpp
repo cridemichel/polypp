@@ -69,6 +69,7 @@ public:
   pvector<ntype, N> errb;
 #endif
   pvector<dcmplx,N> droots;
+  //int conv_crit; /* 0 = Cameron 1 = Bini*/
   void set_coeff(pvector<ntype,N+1> v)
     {
       for (int i=0; i <= N; i++)
@@ -421,13 +422,15 @@ public:
   // evaluate polynomail via Horner's formula 
   ntype calcerrb(cmplx r0, ntype s)
     {
+#if 0
       ntype sp=0.0;
       for (int i=n-1; i >= 0; i--)
         {
           sp = (i+1)*acmon[i+1] + sp*abs(r0);
         }
-
-      return ntype(n)*(abs(evalpoly(r0))+meps*s)/(abs(evaldpoly(r0))-meps*sp);
+#endif
+      //return ntype(n)*(abs(evalpoly(r0))+meps*s)/abs(abs(evaldpoly(r0))-meps*sp);
+      return ntype(n)*(abs(evalpoly(r0))+meps*s)/abs(evaldpoly(r0));
     }
 #endif
   // quadratic equation

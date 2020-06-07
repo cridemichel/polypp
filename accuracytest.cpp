@@ -650,7 +650,7 @@ int main(int argc, char *argv[])
   for (i=0; i < NDEG; i++)
     cr[i] = cmplx(roots[i]);
   // sort roots and calculate relative error
-
+  rp.get_error_bounds();
   sort_sol_opt(cr, er, allrelerr);
   print_roots(testo2, er, cr, allrelerr);
   cout << "Forward relarive error:\n";
