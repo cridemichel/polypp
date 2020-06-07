@@ -297,14 +297,18 @@ public:
 #ifdef BINI_CONV_CRIT
   void get_error_bounds(void)
     {
+      int i=0;
       for (auto& eb: errb)
-        cout << setprecision(200) << eb << "\n";
+        { 
+          cout << setprecision(maxdigits) << "errbound[" << i << "]=" << eb << "\n"; 
+          i++;
+        }
     }
-#endif
   void set_calc_errb(bool v)
     {
       calc_err_bound=v;
     }
+#endif
   void use_this_guess(pvector<dcmplx,N>& rg)
     {
       droots=rg;
@@ -1405,6 +1409,9 @@ public:
       // It is not recommended to set this to false if using multiple precision
       // since you will experience a slowing down by a factor 3.
       use_dbl_iniguess=true; 
+#ifdef BINI_CONV_CRIT
+      calc_err_bound=false;
+#endif
     }
   cpoly()
     {
