@@ -7,7 +7,7 @@
 #else
 #include "./rpoly.hpp"
 #endif
-#define WP 100
+#define WP 1152
 #define WPD 20
 #define WPBS 200
 //#define MPC_MP
@@ -358,6 +358,7 @@ int main(int argc, char* argv[])
 #endif
       rp.set_coeff(c);
       rp.find_roots(roots);
+      //rp.aberth(roots);
 #ifdef BACKSTAB
       berr=calc_backward_err(roots, c);
       if (i==0 || berr > berrmax)

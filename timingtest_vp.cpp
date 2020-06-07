@@ -42,10 +42,10 @@ using bscmplx=number<complex_adaptor<gmp_float<WPBS>>>;
 using namespace boost;
 using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
-using numty=number<mpfr_float_backend<WP>>;
-using cmplx=number<mpc_complex_backend<WP>>;
-using dntype=number<mpfr_float_backend<WPD>>;
-using dcmplx=number<mpc_complex_backend<WPD>>;
+using numty=mpfr_float;
+using cmplx=mpc_complex;
+using dntype=mpfr_float;
+using dcmplx=mpc_complex;
 #ifdef BACKSTAB
 using bsdbl=number<mpfr_float_backend<WPBS>>;
 using bscmplx=number<mpc_complex_backend<BS>>;
@@ -227,6 +227,7 @@ using boost::multiprecision::mpfr_float;
 int main(int argc, char* argv[])
 {
   mpfr_float::default_precision(200);
+  mpc_complex::default_precision(200);
 #ifdef STATIC
 #ifdef CPOLY
   pvector<cmplx,NDEG+1> c;
@@ -357,36 +358,51 @@ int main(int argc, char* argv[])
 #endif
 #endif
 
-
       mpfr_float::default_precision(prec);
+      mpc_complex::default_precision(prec);
+      pvector<cmplx> cvp(NDEG+1);
       cpoly<cmplx,-1,numty> rp(NDEG);
       pvector<cmplx,-1> roini(NDEG);
-      rp.set_coeff(c);
+
+
+      for (j=0; j < NDEG+1; j++)
+        cvp[j].assign(c[j], cvp[j].precision());
+      rp.set_coeff(cvp);
       rp.find_roots(roini);
       for (j=0; j < NDEG; j++)
         roots[j].assign(roini[j], roots[j].precision());
+      cout << "precision=" << roots[0].precision() << "\n";
       prec *=2;
-      for (int ip=0; ip < 3; ip++)
+      //roots.show("roots=");
+      for (int ip=0; ip < 2; ip++)
         {
+          cout << "prec=" << prec << "\n";
           mpfr_float::default_precision(prec);
+          mpc_complex::default_precision(prec);
+          pvector<cmplx> cvp(NDEG+1);
           cpoly<cmplx,-1,numty,cmplx,numty> rp(NDEG);
+          
+          for (j=0; j < NDEG+1; j++)
+            cvp[j].assign(c[j], cvp[j].precision());
+     
           pvector<cmplx,-1> ro(NDEG);
           for (j=0; j < NDEG; j++)
             ro[j].assign(roots[j], ro[j].precision());
           rp.use_this_guess(ro);
-          rp.set_coeff(c);
+          rp.set_coeff(cvp);
           rp.find_roots(ro);
           //rp.aberth(roots);
 
           prec *= 2;
-          cout << "prec=" << prec << "\n";
-          rp.deallocate();
           for (j=0; j < NDEG; j++)
             roots[j].assign(ro[j], roots[j].precision());
-          ro.deallocate();
+#if 0
+          cout << "roprec=" << ro[0].precision() << "\n";
+          cout << "cpvprec="<< cvp[0].precision() << "\n"; 
+          cout << "rootsprec=" << roots[0].precision() << "\n";
+          cout << "coeffprec=" << c[0].precision() << "\n";
+#endif
         }
-      rp.deallocate();
-      roini.deallocate();
 #ifdef BACKSTAB
       berr=calc_backward_err(roots, c);
       if (i==0 || berr > berrmax)

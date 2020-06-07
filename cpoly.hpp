@@ -1061,6 +1061,7 @@ public:
       //we use coeff vector to store them since it won't be used anymore from here on
       if (guess_provided)
         {
+          //cout << setprecision(200) << "ro[0]=" << droots[0] << "\n";
           for (i=0; i < n; i++)
             {
               roots[i]=cmplx(droots[i]);
@@ -1329,7 +1330,7 @@ public:
       maxf= getmax();
       minf = numeric_limits<ntype>::min();
       maxdigits =(numeric_limits<ntype>::digits10)-1;
-      //cout << "numeric digits=" << maxdigits << "\n";
+      cout << "numeric digits=" << maxdigits << " meps=" << meps << "\n";
 
       maxf2 = pow(maxf,0.5)/10.0;
       maxf3 = pow(maxf,1.0/3.0)/10.0;
