@@ -40,7 +40,7 @@
 #include<omp.h>
 #endif
 #define Sqr(x) ((x)*(x))
-//#define BINI_CONV_CRIT // Bini stopping criterion is slightly less accurate and slightly slower than Cameron one.
+#define BINI_CONV_CRIT // Bini stopping criterion is slightly less accurate and slightly slower than Cameron one.
 #define USE_CONVEX_HULL // <- faster (from  T. R. Cameron, Numerical Algorithms, 82, 1065–1084 (2019)
  
 #define USE_ABERTH_REAL //<--- faster
@@ -64,6 +64,9 @@ public:
   bool found[N];
 #ifdef USE_ROLD
   pvector<cmplx, N> rold;
+#endif
+#ifdef BINI_CONV_CRIT
+  pvector<ntype, N> errb;
 #endif
   pvector<dcmplx,N> droots;
   void set_coeff(pvector<ntype,N+1> v)
@@ -111,7 +114,10 @@ public:
   pvector<dcmplx> droots;
   quartic<ntype,cmplx,true> quar;
   bool *found;
-
+#ifdef BINI_CONV_CRIT
+  pvector<ntype> errb;
+#endif
+ 
   cpoly_base_dynamic() = default;
 
   void set_coeff(pvector<ntype,-1> v)
@@ -166,6 +172,9 @@ public:
       rold.deallocate();
 #endif
       droots.deallocate();
+#ifdef BINI_CONV_CRIT
+      errb.deallocate();
+#endif
       delete[] found;
     }
   void allocate(int nc)
@@ -177,6 +186,9 @@ public:
       alpha.allocate(n+1);
 #ifdef USE_ROLD
       rold.allocate(n);
+#endif
+#ifdef BINI_CONV_CRIT
+      errb.allocate(n);
 #endif
       droots.allocate(n);
       found = new bool[n];
@@ -198,6 +210,9 @@ class cpoly: public numeric_limits<ntype>, public cpolybase<cmplx,ntype,dcmplx,N
   using cpolybase<cmplx,ntype,dcmplx,N>::droots;
   using cpolybase<cmplx,ntype,dcmplx,N>::quar;
   using cpolybase<cmplx,ntype,dcmplx,N>::found;
+#ifdef BINI_CONV_CRIT
+  using cpolybase<cmplx,ntype,dcmplx,N>::errb;
+#endif
   const ntype pigr=acos(ntype(-1.0));
   const cmplx I = cmplx(0.0,1.0);
  
@@ -223,7 +238,7 @@ class cpoly: public numeric_limits<ntype>, public cpolybase<cmplx,ntype,dcmplx,N
   ntype Kconv;
   bool gpolish;
   bool use_dbl_iniguess;
-  bool guess_provided;
+  bool guess_provided, calc_err_bound;
 
 #ifdef USE_CONVEX_HULL
   using point=pair<ntype,ntype>; 
@@ -279,6 +294,17 @@ class cpoly: public numeric_limits<ntype>, public cpolybase<cmplx,ntype,dcmplx,N
   vector<int> k;
 
 public:
+#ifdef BINI_CONV_CRIT
+  void get_error_bounds(void)
+    {
+      for (auto& eb: errb)
+        cout << setprecision(200) << eb << "\n";
+    }
+#endif
+  void set_calc_errb(bool v)
+    {
+      calc_err_bound=v;
+    }
   void use_this_guess(pvector<dcmplx,N>& rg)
     {
       droots=rg;
@@ -370,7 +396,7 @@ public:
       cmplx bn=0.0;
       for (int i=n-1; i >= 0; i--)
         {
-          bn = (i+1)*cmon[i+1] + bn*x;
+          bn = cmplx(i+1)*cmon[i+1] + bn*x;
         }
       return bn;
     }
@@ -387,6 +413,19 @@ public:
         }
       return bn;
     }
+#ifdef BINI_CONV_CRIT
+  // evaluate polynomail via Horner's formula 
+  ntype calcerrb(cmplx r0, ntype s)
+    {
+      ntype sp=0.0;
+      for (int i=n-1; i >= 0; i--)
+        {
+          sp = (i+1)*acmon[i+1] + sp*abs(r0);
+        }
+
+      return ntype(n)*(abs(evalpoly(r0))+meps*s)/(abs(evaldpoly(r0))-meps*sp);
+    }
+#endif
   // quadratic equation
   void solve_quadratic(pvector<cmplx,N>&sol)
     {
@@ -455,6 +494,10 @@ public:
          p0 = pa[0];
          pa[0] = xcR*pa[0] - xcI*pa[1] + real(cmon[j]);
          pa[1] = xcR*pa[1] + xcI*p0 + imag(cmon[j]);
+       }
+     if (calc_err_bound)
+       {
+         errb[iac] = calcerrb(r0,s);
        }
      if (abs(cmplx(pa[0],pa[1])) <= 2.0*EPS*(4.0*ntype(n)+1)*s) // stopping criterion of bini 
        {
@@ -542,6 +585,11 @@ public:
          s=abx*s+acmon[j];
        }
 
+     if (calc_err_bound)
+       {
+         errb[iac] = calcerrb(r0,s);
+       }
+  
      if (abs(cmplx(p[0],p[1])) <= 2.0*EPS*(4.0*ntype(n)+1)*s) // stopping criterion of bini 
        {
          return true;
@@ -613,6 +661,12 @@ public:
         {
           s=abx*s+acmon[i];
         }
+   
+      if (calc_err_bound)
+       {
+         errb[iac] = calcerrb(r0,s);
+       }
+   
       absp=abs(p);
       if (absp <= K*s) // stopping criterion of bini 
         {
@@ -664,6 +718,11 @@ public:
           s=abx*s+acmon[i];
           pa=r0*pa+cmon[i];
         }
+      if (calc_err_bound)
+       {
+         errb[iac] = calcerrb(r0,s);
+       }
+   
       absp=abs(pa);
       if (absp <= K*s) // stopping criterion of bini 
         {

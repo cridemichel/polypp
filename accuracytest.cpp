@@ -650,6 +650,7 @@ int main(int argc, char *argv[])
 
   sort_sol_opt(cr, er, allrelerr);
   print_roots(testo2, er, cr, allrelerr);
+  rp.get_error_bounds();
   cout << "Forward relarive error:\n";
   print_accuracy_at(testo2, cr, er, allrelerr);
   return 0;

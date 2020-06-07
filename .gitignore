@@ -16,5 +16,6 @@ poly_cmplx
 poly_real
 .clangd*
 timingtest
+timingtest_vp
 accuracytest
 .brew_packages_installed_
