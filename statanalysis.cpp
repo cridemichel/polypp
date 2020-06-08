@@ -9,7 +9,7 @@
 #include <complex>
 #define WP 200
 //#define MPC_MP
-//#define GMP_MP
+#define GMP_MP
 //#define CPP_MP
 #ifdef CPP_MP
 #include <boost/multiprecision/cpp_bin_float.hpp> 
@@ -203,7 +203,7 @@ int main(int argc, char **argv)
   long long int numtrials, its=0, numout, itsI;
   int numpts, ilogdE;
   int k, i;
- #ifdef CPOLY
+#ifdef CPOLY
   cpoly<pcmplx,-1,pdbl> oqs;
 #else
   rpoly<pdbl,-1,pcmplx> oqs;
@@ -215,7 +215,7 @@ int main(int argc, char **argv)
   sig = 1.0;
   sig2= 1.0;
   logdEmax=10.0;
-  logdEmin=((int)log10(numeric_limits<vldbl>::epsilon()))-6;
+  logdEmin=((int)log10(numeric_limits<vldbl>::epsilon()))-20;
   numpts = PEPTS; 
   dlogdE = (logdEmax -logdEmin)/numpts;
 
@@ -343,9 +343,11 @@ int main(int argc, char **argv)
       for (i=0; i < NDEG; i++)
         csolall[i] = csold[i];
       sort_sol_opt(csolall, exsol, allrelerr);
+      //csolall.show("roots");
       for (k=0; k < NDEG; k++)
         {	
           dE = allrelerr[k]; 
+          //cout << setprecision(100) << "dE=" << dE << "\n";
           if (dE > 0.0)
             {
               logdE=log10(dE)-logdEmin;

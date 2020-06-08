@@ -1,5 +1,6 @@
 #ifndef _CPOLYVP_
 #define _CPOLYVP_
+//#define BINI_CONV_CRIT
 /* 
  * NOTES:
  *
@@ -70,7 +71,6 @@ class cpolyvp: public numeric_limits<ntype> {
   bool guess_provided, calc_err_bound;
   pvector<cmplx> coeff, roots;
   bool *found;
-  vector<int> errb;
  
   void set_coeff(pvector<ntype> v)
     {
@@ -79,24 +79,15 @@ class cpolyvp: public numeric_limits<ntype> {
         coeff[i].assign(cmplx(v[i],0.0),input_precision);
     }
 
-  void set_coeff(pvector<cmplx> v)
-    {
-      set_input_precision(v[0].precision());
-       for (int i=0; i <= n; i++)
-        coeff[i].assign(v[i],input_precision);
-    }
-
  void deallocate(void)
     {
       coeff.deallocate();
-      errb.clear();
       delete[] found;
     }
   void allocate(int nc)
     {
       n=nc;
       coeff.allocate(n+1);
-      errb.resize(n);
       found = new bool[n];
     }
   vector<cmplx> rg;
@@ -107,7 +98,7 @@ class cpolyvp: public numeric_limits<ntype> {
       scoped_precision(unsigned new_p) : p(ntype::default_precision())
       {
          ntype::default_precision(new_p);
-         cmplx::defatul_precision(new_p);
+         cmplx::default_precision(new_p);
       }
       ~scoped_precision()
       {
@@ -118,20 +109,21 @@ class cpolyvp: public numeric_limits<ntype> {
   void set_precision(unsigned p)
     {
       ntype::default_precision(p);
-      cmplx::defatul_precision(p);
+      cmplx::default_precision(p);
     }
 
 public:
-  void get_error_bounds(void)
+  void set_coeff(pvector<cmplx>& v)
     {
-      int i=0;
-      for (auto& eb: errb)
-        { 
-          cout << setprecision(maxdigits) << "errbound[" << i << "]=" << eb << "\n"; 
-          i++;
-        }
+      set_input_precision(v[0].precision());
+       for (int i=0; i <= n; i++)
+        coeff[i].assign(v[i],input_precision);
     }
-    
+  void set_input_precision(unsigned p)
+    {
+      input_precision=p;
+    }
+  
   int degree()
     {
       return n; 
@@ -140,25 +132,25 @@ public:
   // find roots by default uses aberth method which is faster than laguerre implicit method
   void find_roots(pvector<cmplx>& roots)
     {
-      int prec=36;
+      int prec=output_precision+5;
       set_precision(prec);
       pvector<cmplx> cvp(n+1);
-      cpoly<cmplx,-1,ntype,long double, complex<long double>> rp(n);
+      cpoly<cmplx,-1,ntype,complex<long double>, long double> rp(n);
       pvector<cmplx> roini(n);
+      ntype errb, maxerr=0, EPS=pow(ntype(2.0),-ntype(output_precision)*log(10.0)/log(2.0));
       int j;
-
       for (j=0; j < n+1; j++)
         cvp[j].assign(coeff[j], cvp[j].precision());
       rp.set_coeff(cvp);
       rp.find_roots(roini);
-     int nf=0;
-     for (j=0; j < n; j++)
+      int nf=0;
+      //cout << setprecision(200) << "EPS=" << EPS << "\n";
+      for (j=0; j < n; j++)
         {
-          if (roini[j] == cmplx(0,0))
-            errb[j] = int(-log10(rp.calcerrb(roini[j])));
-          else
-            errb[j] = int(-log10(rp.calcerrb(roini[j])/abs(roini[j])));
-          if (errb[j] >= output_precision)
+          errb=rp.calcerrb(roini[j]);
+          if (j==0 || errb > maxerr)
+            maxerr = errb;
+          if (errb <= EPS*abs(roini[j]))
             {
               nf++;
               found[j] = true;
@@ -166,6 +158,7 @@ public:
           else
             found[j] = false;
         }
+      //cout << setprecision(200) << "maxerr= " << maxerr << "\n";
       if (nf == n)
         {
           for (j=0; j < n; j++)
@@ -182,27 +175,32 @@ public:
         {
           set_precision(prec);    
           pvector<cmplx> cvp(n+1);
-          cpoly<cmplx,-1,ntype> rp(n);
-          
+          cpoly<cmplx,-1,ntype,cmplx,ntype> rp(n);
+          ntype errb;
           for (j=0; j < n+1; j++)
             cvp[j].assign(coeff[j], cvp[j].precision());
-     
+
           pvector<cmplx> ro(n);
           for (j=0; j < n; j++)
             ro[j].assign(roots[j], ro[j].precision());
           rp.use_this_guess(ro);
-          rp.set_found(found);
+          rp.set_prec_reached(found);
           rp.set_coeff(cvp);
           rp.find_roots(ro);
           //rp.aberth(roots);
-          ntype relerr;
+          ntype maxerr;
+          nf=0;
           for (j=0; j < n; j++)
             {
-              if (ro[j] == cmplx(0,0))
-                errb[j] = int(-log10(rp.calcerrb(ro[j])));
-              else
-                errb[j] = int(-log10(rp.calcerrb(ro[j])/abs(ro[j])));
-              if (errb[j] >= output_precision)
+              if (found[j])
+                {
+                  nf++;
+                  continue;
+                }
+              errb=rp.calcerrb(ro[j]);
+              if (j==0 || errb > maxerr)
+                maxerr = errb;
+              if (errb <= EPS*abs(ro[j]))
                 {
                   nf++;
                   found[j] = true;
@@ -210,19 +208,21 @@ public:
               else
                 found[j] = false;
             }
+
+          //cout << setprecision(200) << "2) maxerr= " << maxerr <<  "nf=" << nf << "\n";
           prec *= 2;
-         if (nf == n)
+          if (nf == n)
             {
               for (j=0; j < n; j++)
                 roots[j].assign(ro[j], output_precision);
 
               break;
             }
-         else
-           {
-             for (j=0; j < n; j++)
-               roots[j].assign(ro[j], roots[j].precision());
-           }
+          else
+            {
+              for (j=0; j < n; j++)
+                roots[j].assign(ro[j], roots[j].precision());
+            }
         }
     }
 
@@ -236,7 +236,7 @@ public:
       //cout << "numeric digits=" << maxdigits << " meps=" << meps << "\n";
       input_precision=200;
     }
-  cpolyvp(int nc): coeff(nc+1), roots(nc), errb(nc)
+  cpolyvp(int nc): coeff(nc+1), roots(nc)
   {
     init_const();
     found = new bool[nc];

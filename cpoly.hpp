@@ -62,6 +62,7 @@ public:
   pvector<ntype, N+1> alpha;
   quartic<ntype,cmplx,false> quar;
   bool found[N];
+  bool prec_reached[N];
 #ifdef USE_ROLD
   pvector<cmplx, N> rold;
 #endif
@@ -113,9 +114,13 @@ public:
   pvector<dcmplx> droots;
   quartic<ntype,cmplx,true> quar;
   bool *found;
+  bool *prec_reached;
   pvector<ntype> errb;
  
-  cpoly_base_dynamic() = default;
+  cpoly_base_dynamic()
+    {
+      n=0;
+    }
 
   void set_coeff(pvector<ntype,-1> v)
     {
@@ -153,11 +158,13 @@ public:
     rold.allocate(nc);
 #endif
     found = new bool[nc];
+    prec_reached = new bool[nc];
     n=nc;
   }
   ~cpoly_base_dynamic()
     {
       delete[] found;
+      delete[] prec_reached;
     }
   void deallocate(void)
     {
@@ -171,6 +178,7 @@ public:
       droots.deallocate();
       errb.deallocate();
       delete[] found;
+      delete[] prec_reached;
     }
   void allocate(int nc)
     {
@@ -185,6 +193,11 @@ public:
       errb.allocate(n);
       droots.allocate(n);
       found = new bool[n];
+      prec_reached = new bool[n];
+      for (int i=0; i < n; i++)
+        {
+          prec_reached[i] = false;
+        }
     }
 };
 
@@ -203,6 +216,7 @@ class cpoly: public numeric_limits<ntype>, public cpolybase<cmplx,ntype,dcmplx,N
   using cpolybase<cmplx,ntype,dcmplx,N>::droots;
   using cpolybase<cmplx,ntype,dcmplx,N>::quar;
   using cpolybase<cmplx,ntype,dcmplx,N>::found;
+  using cpolybase<cmplx,ntype,dcmplx,N>::prec_reached;
   using cpolybase<cmplx,ntype,dcmplx,N>::errb;
   const ntype pigr=acos(ntype(-1.0));
   const cmplx I = cmplx(0.0,1.0);
@@ -407,21 +421,22 @@ public:
       return bn;
     }
   // evaluate polynomail via Horner's formula 
-  ntype calcerrb_bini96(cmplx r0)
+  ntype calcerrb(cmplx r0)
     {
-      ntype s, sp=0.0, abx;
-      int i, j;
+      ntype s, sp=0.0, abx; 
+      cmplx p, p1=cmplx(0,0);
+      int j;
       s=acmon[n];
+      p = cmon[n];
+      abx = abs(r0);
       for (j=n-1; j >=0; j--) 
         {
+          sp = sp*abx + s;
           s=abx*s+acmon[j];
+          p1 = p1*r0 + p;
+          p = p*r0 + cmon[j];
         }
-
-      for (i=n-1; i >= 0; i--)
-        {
-          sp = (i+1)*acmon[i+1] + sp*abs(r0);
-        }
-      return ntype(n)*(abs(evalpoly(r0))+meps*s)/abs(abs(evaldpoly(r0))-meps*sp);
+      return ntype(n)*(abs(p)+meps*s)/abs(abs(p1)-meps*sp);
       //return ntype(n)*(abs(evalpoly(r0))+meps*s)/abs(evaldpoly(r0));
     }
   // quadratic equation
@@ -1147,7 +1162,7 @@ public:
           for (i=0; i < n; i++)
             {
               // refine conjugate pairs only once!
-              if (found[i]) 
+              if (found[i] || prec_reached[i]) 
                 continue;
               r=abs(roots[i]);
 #ifdef USE_ROLD
@@ -1204,7 +1219,12 @@ public:
         {
           cout << "Found " << nf << " roots out of " << n << "\n";
         }
-
+      if (calc_err_bound)
+        {
+          /* calculate error estimates of roots */
+          for (i=0; i < n; i++)
+            errb[i] = calcerrb(roots[i]);
+        }
       // refine 
       if (polish==true)
         {
@@ -1361,7 +1381,11 @@ public:
     {
       maxdigits=p;
     }
-
+  void set_prec_reached(bool pr[])
+    {
+      for (int i=0; i < n; i++)
+        prec_reached[i]=pr[i];
+    }
   void init_const(void)
     {
       meps = epsilon();
@@ -1385,9 +1409,13 @@ public:
       // It is not recommended to set this to false if using multiple precision
       // since you will experience a slowing down by a factor 3.
       use_dbl_iniguess=true; 
-#ifdef BINI_CONV_CRIT
+      //cout << "n=" << n << "\n";
+      for (int i=0; i < n; i++)
+        {
+          prec_reached[i]=false;
+        }
+
       calc_err_bound=false;
-#endif
     }
   cpoly()
     {
