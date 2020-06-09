@@ -47,6 +47,9 @@
 #if defined(_OPENMP)
 #define USE_ROLD
 #endif
+/* NOTE: I have added a method to check whether roots are newton-isoalted, nevertheless it is not 
+ * more efficient to switch to a simple newton-raphson (NR) if a root is newton isolated since convergence
+ * of NR is quadratic while that of Aberth method is cubic (I made also timing tests to verify this). */
 using namespace std;
 
 template <class cmplx, class ntype, class dcmplx, int N> 
@@ -61,7 +64,7 @@ public:
   pvector<cmplx, N-1> abscmon;
   pvector<ntype, N+1> alpha;
   quartic<ntype,cmplx,false> quar;
-  bool found[N];
+  bool found[N], newt_isol_arr[N];
   bool prec_reached[N];
 #ifdef USE_ROLD
   pvector<cmplx, N> rold;
@@ -113,10 +116,9 @@ public:
 #endif
   pvector<dcmplx> droots;
   quartic<ntype,cmplx,true> quar;
-  bool *found;
+  bool *found, *newt_isol_arr;
   bool *prec_reached;
   pvector<ntype> errb;
- 
   cpoly_base_dynamic()
     {
       n=0;
@@ -158,12 +160,14 @@ public:
     rold.allocate(nc);
 #endif
     found = new bool[nc];
+    newt_isol_arr= new bool[nc];
     prec_reached = new bool[nc];
     n=nc;
   }
   ~cpoly_base_dynamic()
     {
       delete[] found;
+      delete[] newt_isol_arr;
       delete[] prec_reached;
     }
   void deallocate(void)
@@ -179,6 +183,7 @@ public:
       errb.deallocate();
       delete[] found;
       delete[] prec_reached;
+      delete newt_isol_arr;
     }
   void allocate(int nc)
     {
@@ -193,6 +198,7 @@ public:
       errb.allocate(n);
       droots.allocate(n);
       found = new bool[n];
+      newt_isol_arr = new bool[n];
       prec_reached = new bool[n];
       for (int i=0; i < n; i++)
         {
@@ -216,11 +222,12 @@ class cpoly: public numeric_limits<ntype>, public cpolybase<cmplx,ntype,dcmplx,N
   using cpolybase<cmplx,ntype,dcmplx,N>::droots;
   using cpolybase<cmplx,ntype,dcmplx,N>::quar;
   using cpolybase<cmplx,ntype,dcmplx,N>::found;
+  using cpolybase<cmplx,ntype,dcmplx,N>::newt_isol_arr;
   using cpolybase<cmplx,ntype,dcmplx,N>::prec_reached;
   using cpolybase<cmplx,ntype,dcmplx,N>::errb;
   const ntype pigr=acos(ntype(-1.0));
   const cmplx I = cmplx(0.0,1.0);
- 
+
 #ifdef USE_ROLD
   using cpolybase<cmplx,ntype,dcmplx,N>::rold;
 #endif
@@ -297,9 +304,34 @@ class cpoly: public numeric_limits<ntype>, public cpolybase<cmplx,ntype,dcmplx,N
 #endif
   vector<cmplx> rg;
   vector<int> k;
-
+  /* check if the roots is newton-isolated, i.e if a simple newton-raphson
+   * iteration can be applied (without aberth correction) */
+  bool is_newt_isol(int i, pvector<cmplx,N>& roots, pvector <ntype, N>& radius)
+    {
+      ntype theta, v, minv=0.0;
+      int primo=1;
+      for (int j=0; j < n; j++)
+        {
+          v = abs(roots[j]-roots[i])-radius[i]-radius[j];
+          if (j!=i && (primo || v < minv))
+            {
+              primo=0;
+              minv=v;
+            }
+        }
+      theta = radius[i]*(n-1)/minv;
+      //cout << "root["<< i << "] theta=" << theta << " minv=" << minv << " radius=" << radius[i] << "\n";
+      if (theta < ntype(1.0)/ntype(3.0))
+        {
+          return true;
+        }
+      else 
+        {
+          return false;
+        }
+    }
 public:
-  void get_error_bounds(void)
+  void print_error_bounds(void)
     {
       int i=0;
       for (auto& eb: errb)
@@ -307,6 +339,10 @@ public:
           cout << setprecision(maxdigits) << "errbound[" << i << "]=" << eb << "\n"; 
           i++;
         }
+    }
+  ntype get_error_bound(int i)
+    {
+      return errb[i];
     }
   void set_calc_errb(bool v)
     {
@@ -460,7 +496,7 @@ public:
       sol[0] = zxmin;
       sol[1] = zxmax;
     }
-  
+
   bool nr_aberth_real_rev(cmplx &r0, pvector<cmplx,N> &roots, int iac)
     {
       int j;
@@ -488,41 +524,41 @@ public:
       p1[0]=0.0;
       p1[1]=0.0;
       for (j=1;j<=n;j++) {
-       p10 = p1[0];
-       p1[0] = x[0]*p1[0] - x[1]*p1[1] + p[0];
-       p1[1] = x[0]*p1[1] + x[1]*p10 + p[1];
-       p0 = p[0];
-       p[0] = x[0]*p[0] - x[1]*p[1] + real(cmon[j]);
-       p[1] = x[0]*p[1] + x[1]*p0 + imag(cmon[j]);
-     }
+        p10 = p1[0];
+        p1[0] = x[0]*p1[0] - x[1]*p1[1] + p[0];
+        p1[1] = x[0]*p1[1] + x[1]*p10 + p[1];
+        p0 = p[0];
+        p[0] = x[0]*p[0] - x[1]*p[1] + real(cmon[j]);
+        p[1] = x[0]*p[1] + x[1]*p0 + imag(cmon[j]);
+      }
 
 #ifdef BINI_CONV_CRIT
-     s=acmon[n];
-     abx = sqrt(xcR*xcR+xcI*xcI);
-     pa[0]=real(cmon[n]);
-     pa[1]=imag(cmon[n]);
-     for (j=n-1; j >=0; j--) 
-       {
-         s=abx*s+acmon[j];
-         p0 = pa[0];
-         pa[0] = xcR*pa[0] - xcI*pa[1] + real(cmon[j]);
-         pa[1] = xcR*pa[1] + xcI*p0 + imag(cmon[j]);
-       }
-     if (abs(cmplx(pa[0],pa[1])) <= 2.0*EPS*(4.0*ntype(n)+1)*s) // stopping criterion of bini 
-       {
-         return true;
-       }
+      s=acmon[n];
+      abx = sqrt(xcR*xcR+xcI*xcI);
+      pa[0]=real(cmon[n]);
+      pa[1]=imag(cmon[n]);
+      for (j=n-1; j >=0; j--) 
+        {
+          s=abx*s+acmon[j];
+          p0 = pa[0];
+          pa[0] = xcR*pa[0] - xcI*pa[1] + real(cmon[j]);
+          pa[1] = xcR*pa[1] + xcI*p0 + imag(cmon[j]);
+        }
+      if (abs(cmplx(pa[0],pa[1])) <= 2.0*EPS*(4.0*ntype(n)+1)*s) // stopping criterion of bini 
+        {
+          return true;
+        }
 #else
-     err=alpha[0];//abs(cmon[0])*(Kconv*m+1);
-     abx=1.0/sqrt(xcR*xcR+xcI*xcI);
-     for (j=1;j<=n;j++) {
-       err=abx*err+alpha[j];//abs(cmon[j])*(Kconv*j+1);
-     }
-     absp=abs(cmplx(p[0],p[1]));
-     if (absp <= EPS*err || (EPS*err <= minf && absp < minf))
-       {
-         return true;
-       }
+      err=alpha[0];//abs(cmon[0])*(Kconv*m+1);
+      abx=1.0/sqrt(xcR*xcR+xcI*xcI);
+      for (j=1;j<=n;j++) {
+        err=abx*err+alpha[j];//abs(cmon[j])*(Kconv*j+1);
+      }
+      absp=abs(cmplx(p[0],p[1]));
+      if (absp <= EPS*err || (EPS*err <= minf && absp < minf))
+        {
+          return true;
+        }
 #endif 
 
       p1pc=cmplx(p1[0],p1[1])/cmplx(p[0],p[1]);
@@ -532,7 +568,6 @@ public:
       tt[1] = -x[0]*p1p[1]-x[1]*p1p[0];
       p1p[0] = x[0]*tt[0] - x[1]*tt[1];
       p1p[1] = x[1]*tt[0] + x[0]*tt[1];
-
       for (j=0; j < n; j++)
         {
           if (j==iac)
@@ -567,7 +602,7 @@ public:
 #endif
       x[0] = r0.real();
       x[1] = r0.imag();
-     //its=iter;
+      //its=iter;
       p[0]=real(cmon[n]);
       p[1]=imag(cmon[n]);
 #ifndef BINI_CONV_CRIT
@@ -586,24 +621,24 @@ public:
 #ifndef BINI_CONV_CRIT
         err=abx*err+alpha[j];
 #endif
-     }
+      }
 #ifdef BINI_CONV_CRIT
-     s=acmon[n];
-     for (j=n-1; j >=0; j--) 
-       {
-         s=abx*s+acmon[j];
-       }
+      s=acmon[n];
+      for (j=n-1; j >=0; j--) 
+        {
+          s=abx*s+acmon[j];
+        }
 
-     if (abs(cmplx(p[0],p[1])) <= 2.0*EPS*(4.0*ntype(n)+1)*s) // stopping criterion of bini 
-       {
-         return true;
-       }
+      if (abs(cmplx(p[0],p[1])) <= 2.0*EPS*(4.0*ntype(n)+1)*s) // stopping criterion of bini 
+        {
+          return true;
+        }
 #else
-     absp=abs(cmplx(p[0],p[1]));
-     if (absp <= EPS*err || (EPS*err <= minf && absp < minf))
-       {
-         return true;
-       }
+      absp=abs(cmplx(p[0],p[1]));
+      if (absp <= EPS*err || (EPS*err <= minf && absp < minf))
+        {
+          return true;
+        }
 #endif 
 
       p1pc=cmplx(p1[0],p1[1])/cmplx(p[0],p[1]);
@@ -1071,7 +1106,21 @@ public:
           roots[i]=rg[i]; //dal più piccolo al più grande
         }
     }
-
+  void find_newt_isol(pvector<cmplx,N> roots)
+    {
+      int i;
+      for (i=0;i < n; i++)
+        {
+          errb[i] = calcerrb(roots[i]);
+          //cout << "errb[" << i << "]=" << errb[i] << "\n";
+        }
+      for (i=0;i < n; i++)
+        newt_isol_arr[i]=is_newt_isol(i, roots, errb);
+    }
+  bool get_newt_isol(int i)
+    {
+      return newt_isol_arr[i]; 
+    }
   void aberth(pvector<cmplx,N>& roots, bool polish=false)
     {
       bool ret;
@@ -1105,7 +1154,6 @@ public:
         {
           cmon[i]=coeff[i+is]/cn;
         }
-   
       for (i=0; i <=n; i++)
         {
           acmon[i] = abs(cmon[i]);
@@ -1139,7 +1187,9 @@ public:
               drs.set_coeff(dcoeff);
               drs.find_roots(droots);
               for (i=0; i < n; i++)
-                roots[i]=cmplx(droots[i]); 
+                {
+                  roots[i]=cmplx(droots[i]);
+                } 
             }
           else
             initial_guess(roots);
@@ -1149,7 +1199,9 @@ public:
           initial_guess(roots);
         }
       for (i=0;i < n; i++)
-        found[i]=false;
+        {
+          found[i]=false;
+        }
       for (iter=0; iter < itmax && !fine; iter++)
         {
 #ifdef USE_ROLD
@@ -1215,6 +1267,7 @@ public:
                 }
             }
         }
+      cout << "number of iter=" << iter << "\n";
       if (nf < n)
         {
           cout << "Found " << nf << " roots out of " << n << "\n";

@@ -641,19 +641,28 @@ int main(int argc, char *argv[])
   rpoly<pdbl,-1,false,pcmplx> rp(NDEG);
 #endif
   rp.set_coeff(ca);
-#ifdef BINI_CONV_CRIT
   rp.set_calc_errb(true);
-#endif
   rp.show("poly");
   rp.find_roots(roots);
   sprintf(testo2, "OPS");
   for (i=0; i < NDEG; i++)
     cr[i] = cmplx(roots[i]);
   // sort roots and calculate relative error
-  rp.get_error_bounds();
+  pdbl maxrelerr=0.0, relerr;
+  for (i=0; i < NDEG; i++)
+    {
+      if (roots[i]==cmplx(0,0))
+        relerr = abs(rp.get_error_bound(i));
+      else
+        relerr = rp.get_error_bound(i)/abs(roots[i]);
+      if (i==0 || relerr > maxrelerr)
+        maxrelerr = relerr;
+      //cout << "root["<< i << "]=" << roots[i] << " relerr=" << rp.get_error_bound(i)/abs(roots[i]) << "\n";
+    }
+  cout << "MAXIMUM ESTIMATE RELATIVE ERROR=" << maxrelerr << "\n";
   sort_sol_opt(cr, er, allrelerr);
   print_roots(testo2, er, cr, allrelerr);
-  cout << "Forward relarive error:\n";
+  cout << "Forward relative error:\n";
   print_accuracy_at(testo2, cr, er, allrelerr);
   return 0;
 }

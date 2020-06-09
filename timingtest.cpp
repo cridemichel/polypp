@@ -254,7 +254,8 @@ int main(int argc, char* argv[])
 #ifdef _OPENMP
   cout << "# thread=" << omp_get_max_threads() << "\n";
 #endif
-  srand48(time(0));
+  //srand48(time(0));
+  srand48(4242);  
   numty sig=1.0;
   if (argc>=2)
     {
