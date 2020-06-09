@@ -1,9 +1,7 @@
 **polypp**
 ===========
 
-This project provides two C++ classes (*rpoly.hpp* and *cpoly.hpp*) for solving complex and real polynomials of any degree in multiprecision. Quadratic and cubic solver are based on Numerical Recipe book [1].
-Quartic solvers are implemented according to Ref. [2].
-Roots of polynomials of higher degree are found by using Ehrlich–Aberth algorithm as discussed in Refs. [3-5].
+This project provides three C++ classes (*rpoly.hpp*, *cpoly.hpp* and *cpolyvp.hpp*) for solving complex and real polynomials of any degree in multiprecision. The *cpolyvp.hpp* exploits a variable precision (adaptive) strategy to estimate the roots of a complex polynomial with a user supplied precision. Quadratic and cubic solver are based on Numerical Recipe book [1]. Quartic solvers are implemented according to Ref. [2]. Roots of polynomials of higher degree are found by using Ehrlich–Aberth algorithm as discussed in Refs. [3-5].
 Stopping criterion and accurate calculation of correction term in Aberth method 
 have been implemented as suggested in [6].
 
@@ -94,6 +92,9 @@ this program carries out several accuracy tests which can be found in Ref. [7]. 
 where
 
 <test_number> is a number between 1 and 18 which identifies the test to perform (see the sources to recognize the different tests)
+
+**timingtest_vp**  and **accuracytest_vp** are the same as **timingtest** and **accuracytest** respectively, except that
+they use the variable precision strategy provided by the *cpolyvp.hpp* class to guarantee a given output precision.
 
 **Parallelization**
 
