@@ -92,20 +92,22 @@ class cpolyvp: public numeric_limits<ntype> {
     }
   vector<cmplx> rg;
   vector<int> k;
+  unsigned initial_precision;
+  double prec_fact;
   struct scoped_precision
-   {
+    {
       unsigned p;
       scoped_precision(unsigned new_p) : p(ntype::default_precision())
       {
-         ntype::default_precision(new_p);
-         cmplx::default_precision(new_p);
+        ntype::default_precision(new_p);
+        cmplx::default_precision(new_p);
       }
       ~scoped_precision()
-      {
-         ntype::default_precision(p);
-         cmplx::default_precision(p);
-      }
-   };
+        {
+          ntype::default_precision(p);
+          cmplx::default_precision(p);
+        }
+    };
   void set_precision(unsigned p)
     {
       ntype::default_precision(p);
@@ -119,6 +121,10 @@ public:
        for (int i=0; i <= n; i++)
         coeff[i].assign(v[i],input_precision);
     }
+  void set_initial_precision(unsigned p)
+    {
+      initial_precision=p;
+    }
   void set_input_precision(unsigned p)
     {
       input_precision=p;
@@ -128,16 +134,17 @@ public:
     {
       return n; 
     }
-  
   // find roots by default uses aberth method which is faster than laguerre implicit method
   void find_roots(pvector<cmplx>& roots)
     {
-      int prec=output_precision+5;
+      set_precision(output_precision+5);
+      ntype errb, maxerr=0, EPS=pow(ntype(2.0),-ntype(output_precision)*log(10.0)/log(2.0));
+      cmplx roo;
+      unsigned prec=initial_precision;
       set_precision(prec);
       pvector<cmplx> cvp(n+1);
       cpoly<cmplx,-1,ntype,complex<long double>, long double> rp(n);
       pvector<cmplx> roini(n);
-      ntype errb, maxerr=0, EPS=pow(ntype(2.0),-ntype(output_precision)*log(10.0)/log(2.0));
       int j;
       for (j=0; j < n+1; j++)
         cvp[j].assign(coeff[j], cvp[j].precision());
@@ -147,16 +154,20 @@ public:
       //cout << setprecision(200) << "EPS=" << EPS << "\n";
       for (j=0; j < n; j++)
         {
-          errb=rp.calcerrb(roini[j]);
+          errb.assign(rp.calcerrb(roini[j]),errb.precision());
           if (j==0 || errb > maxerr)
             maxerr = errb;
-          if (errb <= EPS*abs(roini[j]))
+          roo.assign(roini[j],roo.precision());
+          if (errb <= EPS*abs(roo))
             {
               nf++;
               found[j] = true;
             }
           else
-            found[j] = false;
+            {
+              //cout << "1)root #" << j << " not accurate enough (errb=" << errb << ")\n";
+              found[j] = false;
+            }
         }
       //cout << setprecision(200) << "maxerr= " << maxerr << "\n";
       if (nf == n)
@@ -170,7 +181,8 @@ public:
           for (j=0; j < n; j++)
             roots[j].assign(roini[j], roots[j].precision());
         }
-      prec *=2;
+      prec = (int)(double(prec)*prec_fact);
+      //cout << "NEWPREC=" << prec << "\n";
       for (int ip=0; ip < 8; ip++)
         {
           set_precision(prec);    
@@ -197,20 +209,25 @@ public:
                   nf++;
                   continue;
                 }
-              errb=rp.calcerrb(ro[j]);
+              errb.assign(rp.calcerrb(ro[j]),errb.precision());
+              roo.assign(roini[j],roo.precision());
               if (j==0 || errb > maxerr)
                 maxerr = errb;
-              if (errb <= EPS*abs(ro[j]))
+              if (errb <= EPS*abs(roo))
                 {
                   nf++;
                   found[j] = true;
                 }
               else
-                found[j] = false;
+                {
+                  //cout << "2)root #" << j << " not accurate enough (errb=" << errb << ")\n";
+                  found[j] = false;
+                }
             }
 
           //cout << setprecision(200) << "2) maxerr= " << maxerr <<  "nf=" << nf << "\n";
-          prec *= 2;
+
+          prec = (int)(double(prec)*prec_fact);
           if (nf == n)
             {
               for (j=0; j < n; j++)
@@ -235,6 +252,8 @@ public:
     {
       //cout << "numeric digits=" << maxdigits << " meps=" << meps << "\n";
       input_precision=200;
+      initial_precision=110;
+      prec_fact=2.0;
     }
   cpolyvp(int nc): coeff(nc+1), roots(nc)
   {

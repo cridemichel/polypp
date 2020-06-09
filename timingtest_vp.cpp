@@ -5,7 +5,6 @@
 #define WPD 20
 #define WPBS 200
 #define MPC_MP
-//#define GMP_MP
 #ifdef CPP_MP
 #include <boost/multiprecision/cpp_bin_float.hpp> 
 #include <boost/multiprecision/cpp_complex.hpp>
@@ -22,8 +21,8 @@ using dcmplx= cpp_complex<WPD>;
 using namespace boost;
 using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
-using numty=number<gmp_float<WP>>;
-using cmplx=number<complex_adaptor<gmp_float<WP>>>;
+using numty=mpf_float;
+using cmplx=number<complex_adaptor<gmp_float<0>>>;
 using dntype=number<gmp_float<WPD>>;
 using dcmplx=number<complex_adaptor<gmp_float<WPD>>>;
 #ifdef BACKSTAB
@@ -36,6 +35,7 @@ using bscmplx=number<complex_adaptor<gmp_float<WPBS>>>;
 using namespace boost;
 using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
+using boost::multiprecision::mpfr_float;
 using numty=mpfr_float;
 using cmplx=mpc_complex;
 using dntype=mpfr_float;
@@ -81,11 +81,10 @@ double gauss(void)
 }
 
 using namespace std;
-using boost::multiprecision::mpfr_float;
 int main(int argc, char* argv[])
 {
-  mpfr_float::default_precision(200);
-  mpc_complex::default_precision(200);
+  numty::default_precision(100);
+  cmplx::default_precision(100);
   pvector<cmplx> c(NDEG+1);
   pvector<cmplx> roots(NDEG);
   cpolyvp<cmplx,numty> rp(NDEG);
@@ -93,7 +92,7 @@ int main(int argc, char* argv[])
 #ifdef _OPENMP
   cout << "# thread=" << omp_get_max_threads() << "\n";
 #endif
-  srand48(time(0));
+  srand48(4242);
   numty sig=1.0;
   if (argc>=2)
     {
@@ -102,7 +101,12 @@ int main(int argc, char* argv[])
   else
     maxiter = 1000000;
   c[NDEG]=1.0;
-  rp.set_output_precision(32); 
+  rp.set_output_precision(100); 
+
+  /* initial precision should be around input_precision (which is automatically
+   * set according to the precision of the coefficients) plus 15 for optimale performance */
+  rp.set_initial_precision(115);
+
   for (int i=0; i < maxiter; i++)
     {
       //cout << "iter #" << i << "\n";
@@ -111,53 +115,6 @@ int main(int argc, char* argv[])
         c[j]=cmplx(2.0*sig*(drand48()-0.5),0.0);
       rp.set_coeff(c);
       rp.find_roots(roots);
-#if 0
-      mpfr_float::default_precision(prec);
-      mpc_complex::default_precision(prec);
-      pvector<cmplx> cvp(NDEG+1);
-      cpoly<cmplx,-1,numty> rp(NDEG);
-      pvector<cmplx,-1> roini(NDEG);
-
-
-      for (j=0; j < NDEG+1; j++)
-        cvp[j].assign(c[j], cvp[j].precision());
-      rp.set_coeff(cvp);
-      rp.find_roots(roini);
-      for (j=0; j < NDEG; j++)
-        roots[j].assign(roini[j], roots[j].precision());
-      cout << "precision=" << roots[0].precision() << "\n";
-      prec *=2;
-      //roots.show("roots=");
-      for (int ip=0; ip < 2; ip++)
-        {
-          cout << "prec=" << prec << "\n";
-          mpfr_float::default_precision(prec);
-          mpc_complex::default_precision(prec);
-          pvector<cmplx> cvp(NDEG+1);
-          cpoly<cmplx,-1,numty,cmplx,numty> rp(NDEG);
-          
-          for (j=0; j < NDEG+1; j++)
-            cvp[j].assign(c[j], cvp[j].precision());
-     
-          pvector<cmplx,-1> ro(NDEG);
-          for (j=0; j < NDEG; j++)
-            ro[j].assign(roots[j], ro[j].precision());
-          rp.use_this_guess(ro);
-          rp.set_coeff(cvp);
-          rp.find_roots(ro);
-          //rp.aberth(roots);
-
-          prec *= 2;
-          for (j=0; j < NDEG; j++)
-            roots[j].assign(ro[j], roots[j].precision());
-#if 0
-          cout << "roprec=" << ro[0].precision() << "\n";
-          cout << "cpvprec="<< cvp[0].precision() << "\n"; 
-          cout << "rootsprec=" << roots[0].precision() << "\n";
-          cout << "coeffprec=" << c[0].precision() << "\n";
-#endif
-        }
-#endif
     }
 
   return 0;

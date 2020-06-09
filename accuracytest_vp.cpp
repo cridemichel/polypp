@@ -1,11 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
-#define CPOLY
-#ifdef CPOLY
-#include "./cpoly.hpp"
-#else
-#include "./rpoly.hpp"
-#endif
+#include "./cpolyvp.hpp"
 #include<complex>
 #include<iostream>
 #include<fstream>
@@ -13,47 +8,17 @@
 #include<string>
 #include <iomanip>
 using namespace std;
-#define MPC_MP
-//#define GMP_MP
 #define WP 200
 #define WPP 200
-#ifdef CPP_MP
-#include <boost/multiprecision/cpp_bin_float.hpp> 
-#include <boost/multiprecision/cpp_complex.hpp>
-using namespace boost;
-using namespace boost::multiprecision;
-using namespace boost::multiprecision::backends;
-using vldbl = number<cpp_bin_float<WP>>;
-using cmplx = cpp_complex<WP>;
-using pdbl=number<cpp_bin_float<WPP>>;
-using pcmplx=cpp_complex<WPP>;
-#elif defined(GMP_MP)
-#include <boost/multiprecision/gmp.hpp>
-#include <boost/multiprecision/complex_adaptor.hpp>
-using namespace boost;
-using namespace boost::multiprecision;
-using namespace boost::multiprecision::backends;
-using vldbl=number<gmp_float<WP>>;
-using cmplx=number<complex_adaptor<gmp_float<WP>>>;
-using pdbl=number<gmp_float<WPP>>;
-using pcmplx=number<complex_adaptor<gmp_float<WPP>>>;
-#elif defined(MPC_MP)
 #include <boost/multiprecision/mpc.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 using namespace boost;
 using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
-using vldbl=number<mpfr_float_backend<WP>>;
-using cmplx=number<mpc_complex_backend<WP>>;
-using pdbl=number<mpfr_float_backend<WPP>>;
-using pcmplx=number<mpc_complex_backend<WPP>>;
-#else
-using vldbl=long double;
-using cmplx=complex<vldbl>;
-using pdbl=double;
-using pcmplx=complex<pdbl>;
-#define WP 16
-#endif
+using vldbl=mpfr_float;
+using cmplx=mpc_complex;
+using pdbl=mpfr_float;
+using pcmplx=mpc_complex;
 //template <int N, int digits=200>
 //using rpolymp = rpoly<number<mpfr_float_backend<digits>>,N,false,number<mpc_complex_backend<digits>>>;
 #define Complex(x,y) cmplx("x","y"))
@@ -509,7 +474,7 @@ numty print_accuracy_at(char *str, cmplx csol[], cmplx exsol[], vldbl allrelerr[
     }
 
   //printf("[%s] relative accuracy=%.16LG\n", str, relerrmax);
-  cout << setprecision(WP) << "[" << str << "relative accuracy=" <<  relerrmax << "\n";
+  cout << setprecision(WP) << "[" << str << "relative accuracy=" <<  relerrmax << "]\n";
   return relerrmax;
 }
 
@@ -602,6 +567,9 @@ void calc_coeff(vldbl co[], cmplx er[])
 
 int main(int argc, char *argv[])
 {
+  numty::default_precision(1000);
+  cmplx::default_precision(1000);
+
   char testo2[256];
   int i, CASO;
 
@@ -626,40 +594,19 @@ int main(int argc, char *argv[])
   numty *allrelerr= new numty[NDEG];
   srand48(0);
 
-#ifdef CPOLY
   pvector<pcmplx> ca(NDEG+1);
   for (i=0; i < NDEG+1; i++)
     ca[i]=pcmplx(vldbl(c[i]),0.0);
-#else
-  pvector<pdbl> ca(NDEG+1);
-  for (i=0; i < NDEG+1; i++)
-    ca[i]=pdbl(c[i]);
-#endif
-#ifdef CPOLY
-  cpoly<pcmplx,-1,pdbl> rp(NDEG);
-#else
-  rpoly<pdbl,-1,false,pcmplx> rp(NDEG);
-#endif
+
+  cpolyvp<pcmplx,pdbl> rp(NDEG);
+  rp.set_initial_precision(220);
+  rp.set_output_precision(200);
   rp.set_coeff(ca);
-  rp.set_calc_errb(true);
-  rp.show("poly");
   rp.find_roots(roots);
   sprintf(testo2, "OPS");
   for (i=0; i < NDEG; i++)
     cr[i] = cmplx(roots[i]);
   // sort roots and calculate relative error
-  pdbl maxrelerr=0.0, relerr;
-  for (i=0; i < NDEG; i++)
-    {
-      if (roots[i]==cmplx(0,0))
-        relerr = abs(rp.get_error_bound(i));
-      else
-        relerr = rp.get_error_bound(i)/abs(roots[i]);
-      if (i==0 || relerr > maxrelerr)
-        maxrelerr = relerr;
-      //cout << "root["<< i << "]=" << roots[i] << " relerr=" << rp.get_error_bound(i)/abs(roots[i]) << "\n";
-    }
-  cout << "MAXIMUM ESTIMATED RELATIVE ERROR=" << maxrelerr << "\n";
   sort_sol_opt(cr, er, allrelerr);
   print_roots(testo2, er, cr, allrelerr);
   cout << "Forward relative error:\n";

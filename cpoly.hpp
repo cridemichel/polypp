@@ -1267,10 +1267,18 @@ public:
                 }
             }
         }
-      cout << "number of iter=" << iter << "\n";
-      if (nf < n)
+      //cout << "number of iter=" << iter << "\n";
+      
+      // do not count roots whose output precision has already been reached
+      // (this happens when this class is used by cpolyvp.hpp class)
+      int npr=0;
+      for (i=0; i < n; i++)
         {
-          cout << "Found " << nf << " roots out of " << n << "\n";
+          npr += prec_reached[i]?1:0;
+        }
+      if (nf+npr < n)
+        {
+          cout << "Found " << nf << " roots out of " << n-npr << "\n";
         }
       if (calc_err_bound)
         {
