@@ -8,8 +8,8 @@
 #include<string>
 #include <iomanip>
 using namespace std;
-#define WP 200
-#define WPP 200
+#define WP 1000
+#define WPO 50
 #include <boost/multiprecision/mpc.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 using namespace boost;
@@ -474,7 +474,7 @@ numty print_accuracy_at(char *str, cmplx csol[], cmplx exsol[], vldbl allrelerr[
     }
 
   //printf("[%s] relative accuracy=%.16LG\n", str, relerrmax);
-  cout << setprecision(WP) << "[" << str << "relative accuracy=" <<  relerrmax << "]\n";
+  cout << setprecision(WPO) << "[" << str << "relative accuracy=" <<  relerrmax << "]\n";
   return relerrmax;
 }
 
@@ -483,8 +483,8 @@ void print_roots(char *str, cmplx er[], cmplx cr[], vldbl allrelerr[])
   printf("CASE %s\n", str);
   for (auto i=0; i < NDEG; i++)
     {
-      cout << setprecision(WP) << "root #" << i << " EX: "<< er[i] << " C:" << cr[i];
-      cout << setprecision(WP) << " [ eps: " << allrelerr[i] << " ]\n"; 
+      cout << setprecision(WPO) << "root #" << i << " EX: "<< er[i] << " C:" << cr[i];
+      cout << setprecision(WPO) << " [ eps: " << allrelerr[i] << " ]\n"; 
     }
 }
 
@@ -557,7 +557,7 @@ void calc_coeff(vldbl co[], cmplx er[])
   fstream f;
   f.open("coeff.dat", ios::out|ios::trunc);
   for (ii=0; ii < NDEG+1; ii++)
-    f << setprecision(WP) << co[ii] << "\n";
+    f << setprecision(WPO) << co[ii] << "\n";
   f.close();
 #endif
   delete [] ir;
@@ -567,8 +567,8 @@ void calc_coeff(vldbl co[], cmplx er[])
 
 int main(int argc, char *argv[])
 {
-  numty::default_precision(1000);
-  cmplx::default_precision(1000);
+  numty::default_precision(WP);
+  cmplx::default_precision(WP);
 
   char testo2[256];
   int i, CASO;
@@ -599,8 +599,8 @@ int main(int argc, char *argv[])
     ca[i]=pcmplx(vldbl(c[i]),0.0);
 
   cpolyvp<pcmplx,pdbl> rp(NDEG);
-  rp.set_initial_precision(220);
-  rp.set_output_precision(200);
+  rp.set_initial_precision(WPO+10);
+  rp.set_output_precision(WPO);
   rp.set_coeff(ca);
   rp.find_roots(roots);
   sprintf(testo2, "OPS");

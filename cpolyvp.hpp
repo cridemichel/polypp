@@ -251,8 +251,8 @@ public:
   void init_const(void)
     {
       //cout << "numeric digits=" << maxdigits << " meps=" << meps << "\n";
-      input_precision=200;
-      initial_precision=110;
+      input_precision=16;
+      initial_precision=32;
       prec_fact=2.0;
     }
   cpolyvp(int nc): coeff(nc+1), roots(nc)
