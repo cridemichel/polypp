@@ -121,7 +121,7 @@ where you can play with the number of threads by changing the value of the envir
 and the degree of the polynomial used for the timing test by changing the macro NDEG in the file timingtest.cpp. 
 
 For polynomials of degree less than 5 the present solver is much faster than tools like MPSolve (ver. 3.1.8, https://numpi.dm.unipi.it/software/mpsolve), while it has a comparable efficiency for higher degree polynomials.
-Differently from MPSolve, the present algorithm does not perform any cluster analysis to boost the convergence 
-in case of multiple roots and you can only set the working precision but not the precision of the roots.
+Differently from MPSolve, the present algorithms does not perform any cluster analysis to boost the convergence 
+in case of multiple roots, 
 
 Enjoy!
