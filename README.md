@@ -122,6 +122,6 @@ and the degree of the polynomial used for the timing test by changing the macro 
 
 For polynomials of degree less than 5 the present solver is much faster than tools like MPSolve (ver. 3.1.8, https://numpi.dm.unipi.it/software/mpsolve), while it has a comparable efficiency for higher degree polynomials.
 Differently from MPSolve, the present algorithms does not perform any cluster analysis to boost the convergence 
-in case of multiple roots, 
+in case of multiple/clustered roots, 
 
 Enjoy!
