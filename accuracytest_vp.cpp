@@ -1,9 +1,14 @@
 #include <stdlib.h>
 #include <stdio.h>
+#define CPOLY
+#ifdef CPOLY
 #include "./cpolyvp.hpp"
-#include<complex>
+#else
+#include "./rpolyvp.hpp"
+#endif
 #include<iostream>
 #include<fstream>
+#include<complex>
 #include<list>
 #include<string>
 #include <iomanip>
@@ -594,11 +599,17 @@ int main(int argc, char *argv[])
   numty *allrelerr= new numty[NDEG];
   srand48(0);
 
+#ifdef CPOLY
   pvector<pcmplx> ca(NDEG+1);
   for (i=0; i < NDEG+1; i++)
     ca[i]=pcmplx(vldbl(c[i]),0.0);
-
   cpolyvp<pcmplx,pdbl> rp(NDEG);
+#else
+  pvector<pdbl> ca(NDEG+1);
+  for (i=0; i < NDEG+1; i++)
+    ca[i]=pdbl(c[i]);
+  rpolyvp<pdbl,pcmplx> rp(NDEG);
+#endif
   rp.set_initial_precision(WPO+10);
   rp.set_output_precision(WPO);
   rp.set_coeff(ca);

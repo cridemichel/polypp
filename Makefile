@@ -74,7 +74,7 @@ endif
 LIBS=$(HBLIBS) 
 CXXFLAGS= -Wall -std=c++17 -O3 
 CXXFLAGSMP=$(CXXFLAGS) $(HBHDRS)
-HEADERS=quartic.hpp pvector.hpp rpoly.hpp cpoly.hpp
+HEADERS=quartic.hpp pvector.hpp rpoly.hpp cpoly.hpp cpolyvp.hpp rpolyvp.hpp
 ifeq ($(PARALLEL),1)
   PARFLA=-fopenmp
 else
@@ -82,7 +82,7 @@ else
 endif 
 LDFLAGS=-lm $(LIBS) $(PARFLA)
 
-all: statanalysis poly_real poly_mp poly_cmplx timingtest accuracytest
+all: statanalysis poly_real poly_mp poly_cmplx timingtest accuracytest timingtest_vp accuracytest_vp
 
 poly_real: poly_real.cpp $(HEADERS)
 	$(CXX) poly_real.cpp $(CXXFLAGS) -o poly_real 
@@ -101,5 +101,12 @@ timingtest: timingtest.cpp $(HEADERS)
 
 accuracytest: accuracytest.cpp $(HEADERS)
 	$(CXX) accuracytest.cpp $(CXXFLAGSMP) $(LDFLAGS) -o accuracytest 
+
+timingtest_vp: timingtest_vp.cpp $(HEADERS)
+	$(CXX) timingtest_vp.cpp $(CXXFLAGSMP) $(LDFLAGS) -o timingtest_vp 
+
+accuracytest_vp: accuracytest_vp.cpp $(HEADERS)
+	$(CXX) accuracytest_vp.cpp $(CXXFLAGSMP) $(LDFLAGS) -o accuracytest_vp 
+
 clean:
-	rm -f timingtest poly_real poly_cmplx poly_mp statanalysis accuracytest *.o $(BREWINST)
+	rm -f timingtest_vp accuracytest_vp timingtest poly_real poly_cmplx poly_mp statanalysis accuracytest *.o $(BREWINST)

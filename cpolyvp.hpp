@@ -49,13 +49,6 @@
 #endif
 using namespace std;
 
-template <class cmplx, class ntype, class dcmplx> 
-class cpolyvp_base_dynamic 
-{
-public:
-  
-};
-
 template <class cmplx, class ntype> 
 class cpolyvp: public numeric_limits<ntype> {
   const ntype pigr=acos(ntype(-1.0));
@@ -72,14 +65,7 @@ class cpolyvp: public numeric_limits<ntype> {
   pvector<cmplx> coeff, roots;
   bool *found;
  
-  void set_coeff(pvector<ntype> v)
-    {
-      set_input_precision(v[0].precision());
-      for (int i=0; i <= n; i++)
-        coeff[i].assign(cmplx(v[i],0.0),input_precision);
-    }
-
- void deallocate(void)
+  void deallocate(void)
     {
       coeff.deallocate();
       delete[] found;
@@ -115,6 +101,12 @@ class cpolyvp: public numeric_limits<ntype> {
     }
 
 public:
+  void set_coeff(pvector<ntype>& v)
+    {
+      set_input_precision(v[0].precision());
+       for (int i=0; i <= n; i++)
+        coeff[i].assign(cmplx(v[i],0.0),input_precision);
+    }
   void set_coeff(pvector<cmplx>& v)
     {
       set_input_precision(v[0].precision());
@@ -265,6 +257,6 @@ public:
     {
       delete[] found;
     }
-   cpolyvp() = delete;
+   cpolyvp()=delete;
 };
 #endif
