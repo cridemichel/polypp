@@ -58,8 +58,8 @@ where:
 *trials*: it is the number of roots (samples A-E) or coefficients (sample F) to generate
 
 *output*: every <output> trials save the the probability distribution function P(eps_rel) 
-	in the file named P_of_eps_rel.dat and the cumulative distribution function F(eps_rel) 
-	in the file named F_of_eps_rel.dat. 
+	in the file named PE.dat and the cumulative distribution function F(eps_rel) 
+	in the file named cumPE.dat. 
 
 *sample*: it is an integer between 0 and 4 which specifies the sample to generate 
 	(cf. Table 4 in Ref. [2] with 0={sample A}, 1={sample B}, 2={sample C}, 3={sample D}, 4={sample E} and
