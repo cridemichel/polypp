@@ -630,6 +630,7 @@ int main(int argc, char *argv[])
   for (i=0; i < NDEG; i++)
     cr[i] = cmplx(roots[i]);
   // sort roots and calculate relative error
+  cout << "roots calculated, sorting...\n";
   sort_sol_opt(cr, er, allrelerr);
   print_roots(testo2, er, cr, allrelerr);
   cout << "Forward relative error:\n";

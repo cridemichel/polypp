@@ -219,7 +219,6 @@ public:
 
           //cout << setprecision(200) << "2) maxerr= " << maxerr <<  "nf=" << nf << "\n";
 
-          //cout << "NEWPREC=" << prec << "\n";
           prec = (int)(double(prec)*prec_fact);
           if (nf == n)
             {
