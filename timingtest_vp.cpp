@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 
   /* initial precision should be around input_precision (which is automatically
    * set according to the precision of the coefficients) plus 15 for optimale performance */
-  //rp.set_initial_precision(115);
+  //rp.set_initial_precision(115); // if initial precision is not provided, it is automatically estimated
 
   for (int i=0; i < maxiter; i++)
     {
