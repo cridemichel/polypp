@@ -422,6 +422,18 @@ void calc_coeff_dep_on_case(int CASO)
         }
       calc_coeff(c, er);
     }
+  else if (CASO==19)
+    {
+      NDEG=20;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+      er[0]=vldbl("1E-15");
+      for (i=1; i < NDEG; i++)
+        { 
+          er[i] = vldbl("1000.0");
+        }
+      calc_coeff(c, er);
+    }
 }
 
 int factorial(int n)
@@ -586,9 +598,9 @@ int main(int argc, char *argv[])
     {
       CASO = 1;
     }
-  if (CASO < 1 || CASO > 18)
+  if (CASO < 1 || CASO > 19)
     {
-      printf("Case must be between 1 and 18\n");
+      printf("Case must be between 1 and 19\n");
       exit(-1);
     }
   calc_coeff_dep_on_case(CASO);
