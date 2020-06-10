@@ -126,13 +126,17 @@ public:
     {
       return n; 
     }
+  unsigned auto_precision(void)
+    {
+      return output_precision + 12;
+    }
   // find roots by default uses aberth method which is faster than laguerre implicit method
   void find_roots(pvector<cmplx>& roots)
     {
       set_precision(output_precision+5);
       ntype errb, maxerr=0, EPS=pow(ntype(2.0),-ntype(output_precision)*log(10.0)/log(2.0));
       cmplx roo;
-      unsigned prec=initial_precision;
+      unsigned prec=initial_precision<=0?auto_precision():initial_precision;
       set_precision(prec);
       pvector<cmplx> cvp(n+1);
       cpoly<cmplx,-1,ntype,complex<long double>, long double> rp(n);
@@ -244,7 +248,7 @@ public:
     {
       //cout << "numeric digits=" << maxdigits << " meps=" << meps << "\n";
       input_precision=16;
-      initial_precision=32;
+      initial_precision=0; // 0 means "auto"
       prec_fact=2.0;
     }
   cpolyvp(int nc): coeff(nc+1), roots(nc)

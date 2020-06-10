@@ -635,7 +635,7 @@ int main(int argc, char *argv[])
     ca[i]=pdbl(c[i]);
   rpolyvp<pdbl,pcmplx> rp(NDEG);
 #endif
-  rp.set_initial_precision(WPO+10);
+  //rp.set_initial_precision(WPO+10); // if initial precision is not provided is automatically estimated
   rp.set_output_precision(WPO);
   rp.set_coeff(ca);
   rp.find_roots(roots);

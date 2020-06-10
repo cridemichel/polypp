@@ -182,6 +182,8 @@ public:
   void find_roots(pvector<cmplx>& roots)
     {
       polvp.set_input_precision(input_precision);
+      if (initial_precision <= 0)
+        initial_precision=polvp.auto_precision();
       polvp.set_initial_precision(initial_precision);
       polvp.set_output_precision(output_precision);
       polvp.set_coeff(coeff);
@@ -199,7 +201,7 @@ public:
    void init_const(void)
     {
       input_precision=16;
-      initial_precision=32;
+      initial_precision=0; // 0 means "auto"
       prec_fact=2.0;
     }
   ~rpolyvp()
