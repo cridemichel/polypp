@@ -15,10 +15,10 @@
 #define Sqr(x) ((x)*(x))
 //#define FAST_MATH
 using namespace std;
-template <class ntype, class cmplx> 
+template <class ntype, class cmplx, class dcmplx=complex<long double>, class dntype=long double> 
 class rpolyvp: public numeric_limits<ntype> {
   int n, maxdigits;
-  cpolyvp<cmplx,ntype> polvp;
+  cpolyvp<cmplx,ntype,dcmplx,dntype> polvp;
   pvector<ntype,-1> coeff, cmon;
   unsigned initial_precision;
   double prec_fact;

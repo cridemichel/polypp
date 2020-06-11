@@ -143,6 +143,17 @@ public:
       cpoly<dcmplx,-1,dntype,dcmplx,dntype> rp(n);
       pvector<dcmplx> roini(n);
       int j;
+      if constexpr (!(is_same<dcmplx,complex<float>>::value && 
+                    is_same<dntype,float>::value) &&
+                    !(is_same<dcmplx,complex<double>>::value &&
+                    is_same<dntype, double>::value) &&
+                    !(is_same<dcmplx,complex<long double>>::value &&
+                    is_same<dntype,long double>::value))
+        {
+          cout << "dcmplx and dntype must be either float, double or long double\n";
+          exit(1);
+        }
+
       for (j=0; j < n+1; j++)
         cvp[j]=dcmplx(coeff[j]);
       rp.iniguess_slow();
@@ -189,7 +200,7 @@ public:
             roots[j]=cmplx(roini[j]);
         }
       //prec = (unsigned)(double(prec)*1.1*abs(log10(EPS)/log10(maxrelerr)));
-      cout << "INIPREC=" << prec << "\n";
+      //cout << "INIPREC=" << prec << "\n";
       for (int ip=0; ip < 8; ip++)
         {
           set_precision(prec);    
