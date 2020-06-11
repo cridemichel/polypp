@@ -63,6 +63,10 @@ public:
       maxdigits=p;
     }
 
+  void show(void)
+    {
+      show(NULL);
+    }
   void show(const char* str)
     {
       int i;

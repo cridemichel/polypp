@@ -101,6 +101,20 @@ class cpolyvp: public numeric_limits<ntype> {
     }
 
 public:
+
+  void show(void)
+    {
+      show(NULL);
+    }
+
+  void show(const char* str)
+    {
+      set_precision(input_precision);
+      cpoly<cmplx,-1,ntype> rp(n);
+      rp.set_show_digits(input_precision);
+      rp.set_coeff(coeff);
+      rp.show(str);
+    } 
   void set_coeff(pvector<ntype>& v)
     {
       set_input_precision(v[0].precision());
