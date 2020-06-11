@@ -440,7 +440,7 @@ void calc_coeff_dep_on_case(int CASO)
       c = new vldbl[NDEG+1];
       er = new cmplx[NDEG];
       er[0]=vldbl("1E-15");
-      for (i=1; i < NDEG-1; i++)
+      for (i=1; i < NDEG-1; i+=2)
         { 
           er[i] = vldbl(1000*i);
           er[i+1] = er[i];
