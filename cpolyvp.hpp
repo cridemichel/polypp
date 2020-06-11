@@ -49,7 +49,7 @@
 #endif
 using namespace std;
 
-template <class cmplx, class ntype> 
+template <class cmplx, class ntype, class dcmplx=complex<long double>, class dntype=long double> 
 class cpolyvp: public numeric_limits<ntype> {
   const ntype pigr=acos(ntype(-1.0));
   const cmplx I = cmplx(0.0,1.0);
@@ -128,32 +128,90 @@ public:
     }
   unsigned auto_precision(void)
     {
-      return output_precision + 12;
+      return output_precision+20;
     }
   // find roots by default uses aberth method which is faster than laguerre implicit method
   void find_roots(pvector<cmplx>& roots)
     {
       set_precision(output_precision+5);
-      ntype errb, maxerr=0, EPS=pow(ntype(2.0),-ntype(output_precision)*log(10.0)/log(2.0));
+      ntype errb, relerr, maxrelerr=0, maxerr=0, EPS=pow(ntype(2.0),-ntype(output_precision)*log(10.0)/log(2.0));
       cmplx roo;
       unsigned prec=initial_precision<=0?auto_precision():initial_precision;
       set_precision(prec);
-      pvector<cmplx> cvp(n+1);
-      cpoly<cmplx,-1,ntype,complex<long double>, long double> rp(n);
-      pvector<cmplx> roini(n);
+      pvector<dcmplx> cvpd(n+1);
+      //pvector<cmplx> cvp(n+1);
+      //cpoly<dcmplx,-1,dntype,dcmplx,dntype> rpd(n);
+      cpoly<dcmplx,-1,dntype,dcmplx,dntype> rp(n);
+      pvector<dcmplx> roini(n);
+      pvector<dcmplx> roinid(n);
       int j;
       for (j=0; j < n+1; j++)
-        cvp[j].assign(coeff[j], cvp[j].precision());
-      rp.set_coeff(cvp);
+        cvpd[j]=dcmplx(coeff[j]);
+      rp.iniguess_slow();
+      rp.set_coeff(cvpd);
       rp.find_roots(roini);
       int nf=0;
       //cout << setprecision(200) << "EPS=" << EPS << "\n";
       for (j=0; j < n; j++)
         {
-          errb.assign(rp.calcerrb(roini[j]),errb.precision());
+          errb=ntype(rp.calcerrb(roinid[j]));
+          if (roinid[j]==dcmplx(0,0))
+            relerr = errb;
+          else
+            relerr = errb/ntype(abs(roinid[j]));
           if (j==0 || errb > maxerr)
             maxerr = errb;
-          roo.assign(roini[j],roo.precision());
+          if (j==0 || relerr> maxrelerr)
+            maxrelerr = relerr;
+
+          roo=cmplx(roinid[j]);
+          if (errb <= EPS*abs(roo))
+            {
+              nf++;
+              found[j] = true;
+            }
+          else
+            {
+              //cout << "1)root #" << j << " not accurate enough (errb=" << errb << ")\n";
+              found[j] = false;
+            }
+        }
+      //cout << setprecision(200) << "maxerr= " << maxerr << "\n";
+      if (nf == n)
+        {
+          for (j=0; j < n; j++)
+            roots[j]=cmplx(roini[j]);
+          return;
+        }
+      else
+        {
+          for (j=0; j < n; j++)
+            roots[j]=cmplx(roini[j]);
+        }
+      cout << "roots precision=" << roots[0].precision() << "\n";
+#if 0
+      for (j=0; j < n+1; j++)
+        cvp[j].assign(coeff[j], cvp[j].precision());
+
+      rp.iniguess_slow();
+      rp.set_coeff(cvp);
+      rp.use_this_guess(roots);
+      rp.find_roots(roini);
+      nf=0;
+      //cout << setprecision(200) << "EPS=" << EPS << "\n";
+      for (j=0; j < n; j++)
+        {
+          errb.assign(rp.calcerrb(roinid[j]),errb.precision());
+          if (roini[j]==cmplx(0,0))
+            relerr = errb;
+          else
+            relerr = errb/abs(roini[j]);
+          if (j==0 || errb > maxerr)
+            maxerr = errb;
+          if (j==0 || relerr> maxrelerr)
+            maxrelerr = relerr;
+
+          roo.assign(roinid[j],roo.precision());
           if (errb <= EPS*abs(roo))
             {
               nf++;
@@ -177,8 +235,11 @@ public:
           for (j=0; j < n; j++)
             roots[j].assign(roini[j], roots[j].precision());
         }
-      prec = (int)(double(prec)*prec_fact);
-      //cout << "NEWPREC=" << prec << "\n";
+#endif
+      //prec = (int)(double(prec)*prec_fact);
+      //prec = (unsigned)(double(prec)*1.1*abs(log10(EPS)/log10(maxrelerr)));
+      //cout << "maxerr=" << maxerr << "\n";
+      cout << "INIPREC=" << prec << "\n";
       for (int ip=0; ip < 8; ip++)
         {
           set_precision(prec);    
@@ -206,7 +267,7 @@ public:
                   continue;
                 }
               errb.assign(rp.calcerrb(ro[j]),errb.precision());
-              roo.assign(roini[j],roo.precision());
+              roo.assign(ro[j],roo.precision());
               if (j==0 || errb > maxerr)
                 maxerr = errb;
               if (errb <= EPS*abs(roo))
@@ -236,6 +297,7 @@ public:
               for (j=0; j < n; j++)
                 roots[j].assign(ro[j], roots[j].precision());
             }
+          cout << "newprec2=" << prec <<"\n";
         }
     }
 
