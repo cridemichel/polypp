@@ -17,6 +17,7 @@ using namespace std;
 #define WPO 50
 #include <boost/multiprecision/mpc.hpp>
 #include <boost/multiprecision/mpfr.hpp>
+#include<chrono>
 using namespace boost;
 using namespace boost::multiprecision;
 using namespace boost::multiprecision::backends;
@@ -30,7 +31,7 @@ using pcmplx=mpc_complex;
 bool allreal=false, doswap=false;
 #undef M_PI
 #define M_PI 3.1415926535897932384626433832795029L
-#define PRINTOUT_COEFF
+//#define PRINTOUT_COEFF
 using numty = vldbl;
 vldbl *c;
 cmplx *er;
@@ -679,8 +680,13 @@ vldbl("-19000.0000000000000010083469625410090344530544825829565525054931640625")
 vldbl("1");
 #endif
   rp.set_coeff(ca);
-  rp.show("p(x)=");
+  //rp.show("p(x)=");
+  auto t1=std::chrono::high_resolution_clock::now();
   rp.find_roots(roots);
+  auto t2=std::chrono::high_resolution_clock::now();
+  std::cout << "finding roots took "
+              << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()
+              << " milliseconds\n";
   sprintf(testo2, "OPS");
   for (i=0; i < NDEG; i++)
     cr[i] = cmplx(roots[i]);
