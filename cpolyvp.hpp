@@ -149,6 +149,7 @@ public:
     {
       set_precision(output_precision+5);
       ntype errb, maxerr=0, EPS=pow(ntype(2.0),-ntype(output_precision)*log(10.0)/log(2.0));
+      //ntype maxrelerr=0, relerr;
       cmplx roo;
       unsigned prec=initial_precision<=0?auto_precision():initial_precision;
       set_precision(prec);
@@ -177,8 +178,16 @@ public:
       for (j=0; j < n; j++)
         {
           errb.assign(ntype(rp.calcerrb(roini[j])), errb.precision());
+#if 0
+          if (roinid[j]==dcmplx(0,0))
+            relerr = errb;
+          else
+            relerr = errb/ntype(abs(roinid[j]));
+#endif
           if (j==0 || errb > maxerr)
             maxerr = errb;
+          //if (j==0 || relerr> maxrelerr)
+            //maxrelerr = relerr;
 
           roo.assign(cmplx(roini[j]), roo.precision());
           if (errb <= EPS*abs(roo))
