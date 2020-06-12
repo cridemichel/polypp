@@ -4,7 +4,8 @@
 #define WP 0
 #define WPD 20
 #define WPBS 200
-#define MPC_MP
+//#define MPC_MP
+#define GMP_MP
 #ifdef CPP_MP
 #include <boost/multiprecision/cpp_bin_float.hpp> 
 #include <boost/multiprecision/cpp_complex.hpp>
@@ -49,12 +50,12 @@ using bscmplx=number<mpc_complex_backend<BS>>;
 using bsdbl=number<mpfr_float_backend<WPBS>>;
 using bscmplx=number<mpc_complex_backend<WPBS>>;
 #endif
+#include<complex>
 using numty=double;
 using cmplx=complex<numty>;
 using dntype=numty;
 using dcmplx=cmplx;
 #endif
-//#include<complex>
 #ifndef NDEG
 #define NDEG 1000
 #endif
