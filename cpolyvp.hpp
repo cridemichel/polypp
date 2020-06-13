@@ -48,6 +48,14 @@
 #define USE_ROLD
 #endif
 using namespace std;
+template <class cmplx, class ntype>
+class azero
+{
+public:
+  cmplx z;
+  ntype r;
+  vector<int> bonds;
+};
 
 template <class cmplx, class ntype, class dcmplx=complex<long double>, class dntype=long double> 
 class cpolyvp: public numeric_limits<ntype> {
@@ -57,6 +65,7 @@ class cpolyvp: public numeric_limits<ntype> {
   ntype eps05, meps, maxf, maxf2, maxf3, minf, scalfact, cubic_rescal_fact;
   unsigned input_precision, output_precision; 
   int maxdigits, n;
+  unsigned current_precision;
   ntype goaleps;
   ntype Kconv;
   bool gpolish;
@@ -96,10 +105,54 @@ class cpolyvp: public numeric_limits<ntype> {
     };
   void set_precision(unsigned p)
     {
+      current_precision=p;
       ntype::default_precision(p);
       cmplx::default_precision(p);
     }
+#if 0
+  vector<azero<cmplx,ntype>> particles;
+  vector<ntype> errbarr;
+  void set_particles(pvector<cmplx>& ro)
+    {
+      particles.resize(n);
+      for (int i=0; i < n; i++)
+        {
+          particles[i].z = ro[i];
+          particles[i].r = errbarr[i];
+        }
+    }
+  void find_bonds(void)
+    {
+      int i, j; 
+      for (i=0; i < n; i++)
+        particles[i].bonds.clear();
+      /* we need to employ linked cell lists to find bonds
+       * otherwise can become very slow for large n */
+      for (i=0; i < n; i++)
+        {
+          for (j=i+1; j < n; j++)
+            {
+              auto sig = particles[i].r + particles[j].r;
+              if (abs(particles[i].z - particles[j].z) <= sig)
+                {
+                  particles[i].bonds.add(j);
+                  particles[j].bonds.add(i);
+                }
+            }
+        }
+    }
 
+  void find_clusters(pvector<cmplx>& ro)
+    {
+
+    }
+  void cluster_analysis(pvector<cmplx>& ro)
+    {
+      set_particles(ro);
+      find_bonds();
+      find_clusters(ro);
+    }
+#endif
 public:
 
   void show(void)
@@ -174,10 +227,15 @@ public:
       rp.set_coeff(cvp);
       rp.find_roots(roini);
       int nf=0;
+#if 0
+      errbarr.resize(n);
+      particles.resize(n);
+#endif
       //cout << setprecision(200) << "EPS=" << EPS << "\n";
       for (j=0; j < n; j++)
         {
           errb.assign(ntype(rp.calcerrb(roini[j])), errb.precision());
+          //errbarr[j].assign(errb,current_precision); 
 #if 0
           if (roinid[j]==dcmplx(0,0))
             relerr = errb;
@@ -269,7 +327,7 @@ public:
               for (j=0; j < n; j++)
                 roots[j].assign(ro[j], roots[j].precision());
             }
-          //cout << "newprec2=" << prec <<"\n";
+          //cout << "newprec2=" << prec << " iter=" << ip << "\n";
         }
     }
 

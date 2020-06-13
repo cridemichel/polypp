@@ -30,7 +30,7 @@ using pcmplx=mpc_complex;
 bool allreal=false, doswap=false;
 #undef M_PI
 #define M_PI 3.1415926535897932384626433832795029L
-//#define PRINTOUT_COEFF
+#define PRINTOUT_COEFF
 using numty = vldbl;
 vldbl *c;
 cmplx *er;
@@ -459,7 +459,22 @@ void calc_coeff_dep_on_case(int CASO)
         }
       calc_coeff(c, er);
     }
-  
+  else if (CASO==22)
+    {
+      NDEG=51;
+      c = new vldbl[NDEG+1];
+      er = new cmplx[NDEG];
+      er[0]=vldbl("1E-15");
+      for (i=1; i < 26; i++)
+        { 
+          er[i] = vldbl("1000.0")+vldbl("1E-32")*vldbl(drand48());
+        }
+      for (i=26; i < 51; i++)
+        { 
+          er[i] = vldbl("100000.0")+vldbl("1E-32")*vldbl(drand48());
+        }
+      calc_coeff(c, er);
+    }
 }
 
 int factorial(int n)
@@ -629,9 +644,9 @@ int main(int argc, char *argv[])
     {
       CASO = 1;
     }
-  if (CASO < 1 || CASO > 21)
+  if (CASO < 1 || CASO > 22)
     {
-      printf("Case must be between 1 and 21\n");
+      printf("Case must be between 1 and 22\n");
       exit(-1);
     }
   calc_coeff_dep_on_case(CASO);
