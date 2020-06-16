@@ -25,7 +25,7 @@
  * [4] T. R. Cameron, Numerical Algorithms, 82, 1065–1084 (2019), doi: https://doi.org/10.1007/s11075-018-0641-9 
  * */
 #include "./cpoly.hpp"
-#include "./linked_cell_lists_2d.hpp"
+#include "./clusters.hpp"
 #include<cstdlib>
 #include<iostream>
 #include<iomanip>
@@ -49,14 +49,6 @@
 #define USE_ROLD
 #endif
 using namespace std;
-template <class cmplx, class ntype>
-class azero
-{
-public:
-  cmplx z;
-  ntype r;
-  vector<int> bonds;
-};
 
 template <class cmplx, class ntype, class dcmplx=complex<long double>, class dntype=long double> 
 class cpolyvp: public numeric_limits<ntype> {
@@ -74,7 +66,7 @@ class cpolyvp: public numeric_limits<ntype> {
   bool guess_provided, calc_err_bound;
   pvector<cmplx> coeff, roots;
   bool *found;
- 
+  clusters<cmplx,ntype> cls; 
   void deallocate(void)
     {
       coeff.deallocate();
@@ -111,54 +103,11 @@ class cpolyvp: public numeric_limits<ntype> {
       cmplx::default_precision(p);
     }
 #if 1
-  vector<azero<cmplx,ntype>> particles;
   vector<ntype> errbarr;
-  linked_cell_lists_2d<azero<cmplx,ntype>> ll;
-  void set_particles(pvector<cmplx>& ro)
-    {
-      particles.resize(n);
-      for (int i=0; i < n; i++)
-        {
-          particles[i].z = ro[i];
-          particles[i].r = errbarr[i];
-        }
-    }
-  void find_bonds(void)
-    {
-      int i, j; 
-      for (i=0; i < n; i++)
-        particles[i].bonds.clear();
-      /* we need to employ linked cell lists to find bonds
-       * otherwise can become very slow for large n */
-      for (i=0; i < n; i++)
-        {
-          for (j=i+1; j < n; j++)
-            {
-              auto sig = particles[i].r + particles[j].r;
-              if (abs(particles[i].z - particles[j].z) <= sig)
-                {
-                  particles[i].bonds.add(j);
-                  particles[j].bonds.add(i);
-                }
-            }
-        }
-    }
-  void create_ll(pvector<cmplx>& ro)
-    {
-      ntype L[2], rc;
-      /* calculate L and cutoff radius */
-      ll.init(&particles,L,rc,n);
-    }
-  void find_clusters(pvector<cmplx>& ro)
-    {
-
-    }
   void cluster_analysis(pvector<cmplx>& ro)
     {
-      set_particles(ro);
-      create_ll(ro);
-      find_bonds();
-      find_clusters(ro);
+      cls.init(ro, errbarr);
+      cls.get_clusters();
     }
 #endif
 public:
