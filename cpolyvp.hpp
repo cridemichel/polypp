@@ -25,6 +25,7 @@
  * [4] T. R. Cameron, Numerical Algorithms, 82, 1065–1084 (2019), doi: https://doi.org/10.1007/s11075-018-0641-9 
  * */
 #include "./cpoly.hpp"
+#include "./linked_cell_lists_2d.hpp"
 #include<cstdlib>
 #include<iostream>
 #include<iomanip>
@@ -109,9 +110,10 @@ class cpolyvp: public numeric_limits<ntype> {
       ntype::default_precision(p);
       cmplx::default_precision(p);
     }
-#if 0
+#if 1
   vector<azero<cmplx,ntype>> particles;
   vector<ntype> errbarr;
+  linked_cell_lists_2d ll;
   void set_particles(pvector<cmplx>& ro)
     {
       particles.resize(n);
@@ -227,7 +229,7 @@ public:
       rp.set_coeff(cvp);
       rp.find_roots(roini);
       int nf=0;
-#if 0
+#if 1
       errbarr.resize(n);
       particles.resize(n);
 #endif
@@ -235,7 +237,7 @@ public:
       for (j=0; j < n; j++)
         {
           errb.assign(ntype(rp.calcerrb(roini[j])), errb.precision());
-          //errbarr[j].assign(errb,current_precision); 
+          errbarr[j].assign(errb,current_precision); 
 #if 0
           if (roinid[j]==dcmplx(0,0))
             relerr = errb;
