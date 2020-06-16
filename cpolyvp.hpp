@@ -1,5 +1,6 @@
 #ifndef _CPOLYVP_
 #define _CPOLYVP_
+#define CLUSTER_ANALYSIS
 //#define BINI_CONV_CRIT
 /* 
  * NOTES:
@@ -66,7 +67,9 @@ class cpolyvp: public numeric_limits<ntype> {
   bool guess_provided, calc_err_bound;
   pvector<cmplx> coeff, roots;
   bool *found;
+#ifdef CLUSTER_ANALYSIS
   clusters<cmplx,ntype> cls; 
+#endif
   void deallocate(void)
     {
       coeff.deallocate();
@@ -102,12 +105,13 @@ class cpolyvp: public numeric_limits<ntype> {
       ntype::default_precision(p);
       cmplx::default_precision(p);
     }
-#if 1
+#ifdef CLUSTER_ANALYSIS
   vector<ntype> errbarr;
+  vector<vector<int>> cl;
   void cluster_analysis(pvector<cmplx>& ro, ntype maxerr)
     {
       cls.init(ro, errbarr, maxerr);
-      cls.get_clusters();
+      cls.find_clusters(cl);
     }
 #endif
 public:
@@ -184,12 +188,16 @@ public:
       rp.set_coeff(cvp);
       rp.find_roots(roini);
       int nf=0;
+#ifdef CLUSTER_ANALYSIS
       errbarr.resize(n);
+#endif
       //cout << setprecision(200) << "EPS=" << EPS << "\n";
       for (j=0; j < n; j++)
         {
           errb.assign(ntype(rp.calcerrb(roini[j])), errb.precision());
+#ifdef CLUSTER_ANALYSIS
           errbarr[j].assign(errb,current_precision); 
+#endif
 #if 0
           if (roinid[j]==dcmplx(0,0))
             relerr = errb;
@@ -225,7 +233,9 @@ public:
           for (j=0; j < n; j++)
             roots[j].assign(cmplx(roini[j]), roots[j].precision());
         }
+#ifdef CLUSTER_ANALYSIS
       cluster_analysis(roots, maxerr);
+#endif
       //prec = (unsigned)(double(prec)*1.1*abs(log10(EPS)/log10(maxrelerr)));
       //cout << "INIPREC=" << prec << "\n";
       for (int ip=0; ip < 8; ip++)
@@ -282,6 +292,10 @@ public:
               for (j=0; j < n; j++)
                 roots[j].assign(ro[j], roots[j].precision());
             }
+#ifdef CLUSTER_ANALYSIS
+          cluster_analysis(roots, maxerr);
+#endif
+ 
           //cout << "newprec2=" << prec << " iter=" << ip << "\n";
         }
     }
