@@ -14,14 +14,16 @@ class clusters
   vector<part<ntype>> parts;
   int Np;
   vector<int>* listneigh;
-
+  ntype maxr; //maximum radius of particles
+  pvector<ntype,2> L; // box size 
+  pvector<ntype,2> rCM[2];
 public:
 
-  void init(pvector<cmplx>& ro, pvector<ntype>&rad )
+  void init(pvector<cmplx>& ro, pvector<ntype>&rad, ntype& maxerr)
     {
       Np = (*ro).size();
       parts.resize(Np);
-
+      maxr = maxerr;
       for (int i=0; i < Np; i++)
         {
           parts[i].x[0] = real(ro[i]);
@@ -63,11 +65,51 @@ public:
             }
         }
     }
+  void calculate_L(void)
+    {
+      bool first=true;
+      ntype absx[2];
+      for (auto p: parts)
+        {
+          absx[0] = abs(p.x[0])+abs(p.r);
+          absx[1] = abs(p.x[1])+abs(p.r);
+          if (first)
+            {
+              first = false;
+              L[0] = absx[0];
+              L[1] = absx[1];
+            }
+          else
+            {
+              if (absx[0] > L[0])
+                L[0] = absx[0];
+              if (absx[1] > L[1])
+                L[1] = absx[1];
+            }
+        }
+      L[0] *= 2.0;
+    }
+  void translate_cm(void)
+    {
+      rCM << ntype(0.0), ntype(0.0);
+      for (auto& p: parts)
+        {
+          rCM[0] += p.x[0];
+          rCM[1] += p.x[1];
+        }
+      rCM /= ntype(Np);
+      for (auto& p: parts)
+        {
+          p.x[0] -= rCM[0];
+          p.x[1] -= rCM[1];
+        }
+    }
   void create_ll(void)
     {
-      ntype L[2], rc;
+      translate_cm();
       /* calculate L and cutoff radius */
-      ll.init(&parts,L,rc,Np);
+      calculate_L();
+      ll.init(&parts,L,ntype(2.0)*maxr,Np);
       ll.build();
     }
   clusters()

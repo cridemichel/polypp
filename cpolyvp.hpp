@@ -104,9 +104,9 @@ class cpolyvp: public numeric_limits<ntype> {
     }
 #if 1
   vector<ntype> errbarr;
-  void cluster_analysis(pvector<cmplx>& ro)
+  void cluster_analysis(pvector<cmplx>& ro, ntype maxerr)
     {
-      cls.init(ro, errbarr);
+      cls.init(ro, errbarr, maxerr);
       cls.get_clusters();
     }
 #endif
@@ -184,10 +184,7 @@ public:
       rp.set_coeff(cvp);
       rp.find_roots(roini);
       int nf=0;
-#if 1
       errbarr.resize(n);
-      particles.resize(n);
-#endif
       //cout << setprecision(200) << "EPS=" << EPS << "\n";
       for (j=0; j < n; j++)
         {
@@ -228,6 +225,7 @@ public:
           for (j=0; j < n; j++)
             roots[j].assign(cmplx(roini[j]), roots[j].precision());
         }
+      cluster_analysis(roots, maxerr);
       //prec = (unsigned)(double(prec)*1.1*abs(log10(EPS)/log10(maxrelerr)));
       //cout << "INIPREC=" << prec << "\n";
       for (int ip=0; ip < 8; ip++)
