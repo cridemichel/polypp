@@ -10,12 +10,11 @@
  * */
 using namespace std;
 // particles is the particle type, e.g. lj<double> 
-template <class particles, class rectangles=int, bool boxes=false>
+template <class particles>
 class linked_cell_lists_2d
 {
   using ntype = typename particles::numtype;
   vector<particles>* part;
-  vector<rectangles> *rect;
   pvector<int,-1> cellList, cellListBak;
   int cellsx, cellsy, cellsz;
   pvector<int,-1> inCell[2];

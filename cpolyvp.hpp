@@ -113,7 +113,7 @@ class cpolyvp: public numeric_limits<ntype> {
 #if 1
   vector<azero<cmplx,ntype>> particles;
   vector<ntype> errbarr;
-  linked_cell_lists_2d ll;
+  linked_cell_lists_2d<azero<cmplx,ntype>> ll;
   void set_particles(pvector<cmplx>& ro)
     {
       particles.resize(n);
@@ -143,7 +143,12 @@ class cpolyvp: public numeric_limits<ntype> {
             }
         }
     }
-
+  void create_ll(pvector<cmplx>& ro)
+    {
+      ntype L[2], rc;
+      /* calculate L and cutoff radius */
+      ll.init(&particles,L,rc,n);
+    }
   void find_clusters(pvector<cmplx>& ro)
     {
 
@@ -151,6 +156,7 @@ class cpolyvp: public numeric_limits<ntype> {
   void cluster_analysis(pvector<cmplx>& ro)
     {
       set_particles(ro);
+      create_ll(ro);
       find_bonds();
       find_clusters(ro);
     }
