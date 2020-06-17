@@ -17,6 +17,7 @@ class clusters
   ntype maxr; //maximum radius of particles
   pvector<ntype,2> L; // box size 
   pvector<ntype,2> rCM[2];
+  vector<int> colors, clsdim, clscol;
 public:
 
   void init(pvector<cmplx>& ro, pvector<ntype>&rad, ntype& maxerr)
@@ -32,11 +33,99 @@ public:
         }
     }
   using vvint = vector<vector<int>>;
+
+  void change_all_colors(int colorsrc, int colordst)
+    {
+      int ii;
+      for (ii = 0; ii < Np; ii++)
+        {
+          if (colors[ii] == colorsrc)
+            colors[ii] = colordst;
+        }
+    }
+
+  int findmaxColor(void)
+    {
+      int i, maxc=-1;
+      for (i = 0; i < Np; i++) 
+        {
+          if (colors[i] > maxc)
+            maxc = colors[i];
+        }
+      return maxc;
+    }
+
   void color_algo(vvint& cls)
     {
+      int curcolor=0, i, ncls, nc;
       /* find clusters by using color algorithm */ 
-    
+      colors.resize(Np);
+      clsdim.resize(Np);
+      clscol.resize(Np);
+      clsdimNV.resize(Np);
+      clscolNV.resize(Np); 
+      for (i=0; i < Np; i++)
+        colors[i] = -1;
+      for (i=0; i < Np; i++)
+        {
+          if (colors[i] == -1)
+            colors[i] = curcolor;
+          
+          for (int j: parts[i].bonds)
+            {
+              if (colors[j] == -1)
+                colors[j] = colors[i];
+              else
+                {
+                  if (colors[i] < colors[j])
+                    change_all_colors(colors[j], colors[i]);
+                  else if (colors[i] > colors[j])
+                    change_all_colors(colors[i], colors[j]);
+                }
+            }
+          curcolor = findmaxColor()+1;
+        }
+      /* single particles are clusters of size 1 */
+      for (i = 0; i < Np; i++)
+	{
+	  if (colors[i]==-1)
+	    {	    
+	      colors[i] = curcolor;
+	      curcolor++;
+	    } 
+	}
+      ncls = curcolor;
+      for (nc = 0; nc < ncls; nc++)
+	{
+	  clsdim[nc] = 0; 
+	}
+      int a;
+      for (nc = 0; nc < ncls; nc++)
+	{
+	  for (a = 0; a < Np; a++)
+	    if (colors[a] == nc)
+	      {
+		clsdim[nc]++;
+		clscol[nc] = colors[a];
+	      }
+	}
+      cls.resize(ncls);
+      int clsidx=0;
+      for (nc = 0; nc < ncls; nc++)
+        {
+          if (clsdim[nc] == 0)
+            continue;
+          cls[clsidx].resize(clsdim[nc]);
+          for (i=0; i < Np; i++)
+            {
+              if (colors[i] == clscol[nc])
+                cls[clsidx].push_back(i);
+            }
+          clsidx++;
+        }
+      cls.resize(clsidx);
     }
+
   void find_clusters(vvint& cls)
     {
       create_ll();
