@@ -62,8 +62,6 @@ public:
       colors.resize(Np);
       clsdim.resize(Np);
       clscol.resize(Np);
-      clsdimNV.resize(Np);
-      clscolNV.resize(Np); 
       for (i=0; i < Np; i++)
         colors[i] = -1;
       for (i=0; i < Np; i++)
