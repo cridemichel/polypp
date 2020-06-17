@@ -10,7 +10,7 @@
  * */
 using namespace std;
 // particles is the particle type, e.g. lj<double> 
-template <class particles>
+template <class particles, class rectangles=int, bool boxes=false>
 class linked_cell_lists_2d
 {
   using ntype = typename particles::numtype;
