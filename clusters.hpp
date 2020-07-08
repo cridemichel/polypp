@@ -3,7 +3,8 @@ template <class ntype>
 class part
 {
 public:
-  ntype x[2];
+  using numtype=ntype;
+  pvector<ntype,2> x;
   ntype r;
   vector<int> bonds;
 };
@@ -20,9 +21,9 @@ class clusters
   vector<int> colors, clsdim, clscol;
 public:
 
-  void init(pvector<cmplx>& ro, pvector<ntype>&rad, ntype& maxerr)
+  void init(pvector<cmplx>& ro, pvector<ntype>& rad, ntype& maxerr)
     {
-      Np = (*ro).size();
+      Np = ro.size();
       parts.resize(Np);
       maxr = maxerr;
       for (int i=0; i < Np; i++)
@@ -144,10 +145,10 @@ public:
           for (int j: *listneigh)
             {
               auto sig = parts[i].r + parts[j].r;
-              if (abs(parts[i].z - parts[j].z) <= sig)
+              if ((parts[i].x - parts[j].x).norm() <= sig)
                 {
-                  parts[i].bonds.add(j);
-                  parts[j].bonds.add(i);
+                  parts[i].bonds.push_back(j);
+                  parts[j].bonds.push_back(i);
                 }
             }
         }

@@ -314,7 +314,7 @@ public:
                       // lo shift è sbagliato!
                       listneigh.push_back(n);
                       //listneigh[cc++] = n;
-                      (*part)[n].shift = shift;
+                      //(*part)[n].shift = shift;
                       // minimum image convention
                       cc++;
                     }

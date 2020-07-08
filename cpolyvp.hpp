@@ -106,7 +106,7 @@ class cpolyvp: public numeric_limits<ntype> {
       cmplx::default_precision(p);
     }
 #ifdef CLUSTER_ANALYSIS
-  vector<ntype> errbarr;
+  pvector<ntype> errbarr;
   vector<vector<int>> cl;
   void cluster_analysis(pvector<cmplx>& ro, ntype maxerr)
     {
