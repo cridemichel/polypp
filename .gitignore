@@ -20,3 +20,4 @@ timingtest_vp
 accuracytest
 .brew_packages_installed_
 accuracytest_vp
+.cache
