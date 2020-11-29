@@ -10,8 +10,8 @@
 #define WP 100
 #define WPD 20
 #define WPBS 200
-//#define MPC_MP
-#define GMP_MP
+#define MPC_MP
+//#define GMP_MP
 #ifdef CPP_MP
 #include <boost/multiprecision/cpp_bin_float.hpp> 
 #include <boost/multiprecision/cpp_complex.hpp>
