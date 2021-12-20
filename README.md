@@ -124,4 +124,11 @@ For polynomials of degree less than 5 the present solver is much faster than too
 Differently from MPSolve, the present algorithms does not perform (yet) any cluster analysis to boost the convergence 
 in case of multiple/clustered roots, 
 
+**Citing**
+
+If you use polypp in your research, please consider giving proper attribution by citing the following publication:
+	
+- A.G. Orellana and C. De Michele, Algorithm 1010: Boosting Efficiency in Solving Quartic Equations with No Compromise in Accuracy,
+*ACM Trans. Math. Softw.* **46**, 20:1-20:28 (2020) https://doi.org/10.1145/3386241
+
 Enjoy!
