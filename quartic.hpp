@@ -1361,7 +1361,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   else 
     realcase[0] = -1; // d2=0
   /* Case III: d2 is 0 or approximately 0 (in this case check which solution is better) */
-  if (realcase[0]==-1 || (abs(d2) <= meps*oqs_max3(abs(2.*b/3.), abs(phi0), l1*l1))) 
+  if (realcase[0]==-1 || (abs(d2) <= meps*(abs(2.*b/3.) + abs(phi0) + l1*l1))) 
     {
       d3 = d - l3*l3;
       if (realcase[0]==1)
@@ -1634,7 +1634,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
       ccx = ccxv[kmin];
     }
   /* Case III: d2 is 0 or approximately 0 (in this case check which solution is better) */
-  if (abs(d2) <= meps*oqs_max3(abs(cmplx(2.)*b/cmplx(3.)), abs(phi0), abs(l1*l1))) 
+  if (abs(d2) <= meps*(abs(cmplx(2.)*b/cmplx(3.)) + abs(phi0) + abs(l1*l1))) 
     {
       d3 = d - l3*l3;
       err0 = oqs_calc_err_abcd_ccmplx(a, b, c, d, acx, bcx, ccx, dcx);
