@@ -980,7 +980,10 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   /* Newton-Raphson described in sec. 2.3 of the manuscript for complex
    * coefficients a,b,c,d */
   int iter, k1, k2;
-  ntype x02, errf, errfold, xold[4], x[4], dx[4], det, Jinv[4][4], fvec[4], vr[4];
+  ntype x02, errf, errfold, x[4], dx[4], det, Jinv[4][4], fvec[4], vr[4];
+  ntype  errfa, errfmin;
+  ntype xmin[4];
+
   x[0] = AQ;
   x[1] = BQ;
   x[2] = CQ;
@@ -994,14 +997,18 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   fvec[2] = x[1] + x[0]*x[2] + x[3] - b;
   fvec[3] = x[0] + x[2] - a; 
   errf=0;
+  errfa=0;
   for (k1=0; k1 < 4; k1++)
     {
       if (vr[k1]==0)
         errf += abs(fvec[k1]);
       else
-        errf +=abs(fvec[k1]/vr[k1]);
+        errf += abs(fvec[k1]/vr[k1]);
+      errfa += abs(fvec[k1]);
+      xmin[k1]=x[k1];
     }
-  for (iter = 0; iter < 8; iter++)
+  errfmin=errfa;
+  for (iter = 0; iter < 20; iter++)
     {
       x02 = x[0]-x[2];
       det = x[1]*x[1] + x[1]*(-x[2]*x02 - 2.0*x[3]) + x[3]*(x[0]*x02 + x[3]);
@@ -1030,9 +1037,6 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
 	    dx[k1] += Jinv[k1][k2]*fvec[k2];
 	}
       for (k1=0; k1 < 4; k1++)
-      	xold[k1] = x[k1];
-
-      for (k1=0; k1 < 4; k1++)
 	{
 	  x[k1] += -dx[k1]/det;
 	}
@@ -1042,26 +1046,32 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
       fvec[3] = x[0] + x[2] - a; 
       errfold = errf;
       errf=0;
+      errfa = 0.0;
       for (k1=0; k1 < 4; k1++)
 	{
-        if (vr[k1]==0)
-	  errf += abs(fvec[k1]);
-        else
-	  errf += abs(fvec[k1]/vr[k1]);
-	}
+          if (vr[k1]==0)
+            errf += abs(fvec[k1]);
+          else
+            errf += abs(fvec[k1]/vr[k1]);
+          errfa += abs(fvec[k1]);
+        }
+      if (errfa < errfmin)
+        {
+          errfmin = errfa;
+          for (k1=0; k1 < 4; k1++)
+            xmin[k1]=x[k1];
+        }
       if (errf==0)
 	break;
       if (errf >= errfold)
 	{
-	  for (k1=0; k1 < 4; k1++)
-	    x[k1] = xold[k1];
 	  break;
 	}
     }
-  AQ=x[0];
-  BQ=x[1];
-  CQ=x[2];
-  DQ=x[3];
+  AQ=xmin[0];
+  BQ=xmin[1];
+  CQ=xmin[2];
+  DQ=xmin[3];
 }
 
 template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dynamic>::NRabcdCCmplx(cmplx a, cmplx b, cmplx c, cmplx d, 
@@ -1072,6 +1082,8 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   int iter, k1, k2;
   cmplx x02, xold[4], dx[4], x[4], det, Jinv[4][4], fvec[4], vr[4];
   ntype errf, errfold;
+  ntype errfa, errfmin;
+  cmplx xmin[4];
   x[0] = AQ;
   x[1] = BQ;
   x[2] = CQ;
@@ -1085,15 +1097,19 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   fvec[2] = x[1] + x[0]*x[2] + x[3] - b;
   fvec[3] = x[0] + x[2] - a; 
   errf=0;
+  errfa=0;
   for (k1=0; k1 < 4; k1++)
     {
       errf += (vr[k1]==cmplx(0))?abs(fvec[k1]):abs(fvec[k1]/vr[k1]);
+      errfa += abs(fvec[k1]);
+      xmin[k1]=x[k1];
     }
 
+  errfmin = errfa;
   if (errf==0)
     return;
 
-  for (iter = 0; iter < 8; iter++)
+  for (iter = 0; iter < 20; iter++)
     {
       x02 = x[0]-x[2];
       det = x[1]*x[1] + x[1]*(-x[2]*x02 - cmplx(2.0)*x[3]) + x[3]*(x[0]*x02 + x[3]);
@@ -1136,23 +1152,29 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
 
       errfold = errf;
       errf=0;
+      errfa = 0.0;
       for (k1=0; k1 < 4; k1++)
         {
           errf += (vr[k1]==cmplx(0))?abs(fvec[k1]):abs(fvec[k1]/vr[k1]);
+          errfa += abs(fvec[k1]);
+        }
+      if (errfa < errfmin)
+        {
+          errfmin = errfa;
+          for (k1=0; k1 < 4; k1++)
+            xmin[k1]=x[k1];
         }
       if (errf==0)
         break;
       if (errf >= errfold)
         {
-          for (k1=0; k1 < 4; k1++)
-            x[k1] = xold[k1];
           break;
         }
     }
-  AQ=x[0];
-  BQ=x[1];
-  CQ=x[2];
-  DQ=x[3];
+  AQ=xmin[0];
+  BQ=xmin[1];
+  CQ=xmin[2];
+  DQ=xmin[3];
 }
 
 template <class ntype, class cmplx, bool dynamic> void  quartic<ntype,cmplx, dynamic>::oqs_solve_quadratic(ntype a, ntype b, cmplx roots[2])
@@ -1206,6 +1228,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
       cout << "That's not a quartic!\n";
       return;
     }
+
   a=coeff[3]/coeff[4];
   b=coeff[2]/coeff[4];
   c=coeff[1]/coeff[4];
@@ -1361,7 +1384,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   else 
     realcase[0] = -1; // d2=0
   /* Case III: d2 is 0 or approximately 0 (in this case check which solution is better) */
-  if (realcase[0]==-1 || (abs(d2) <= meps*oqs_max3(abs(2.*b/3.), abs(phi0), l1*l1))) 
+  if (realcase[0]==-1 || (abs(d2) <= meps*(abs(2.*b/3.) + abs(phi0) + l1*l1))) 
     {
       d3 = d - l3*l3;
       if (realcase[0]==1)
@@ -1634,7 +1657,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
       ccx = ccxv[kmin];
     }
   /* Case III: d2 is 0 or approximately 0 (in this case check which solution is better) */
-  if (abs(d2) <= meps*oqs_max3(abs(cmplx(2.)*b/cmplx(3.)), abs(phi0), abs(l1*l1))) 
+  if (abs(d2) <= meps*(abs(cmplx(2.)*b/cmplx(3.)) + abs(phi0) + abs(l1*l1))) 
     {
       d3 = d - l3*l3;
       err0 = oqs_calc_err_abcd_ccmplx(a, b, c, d, acx, bcx, ccx, dcx);
