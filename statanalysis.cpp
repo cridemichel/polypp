@@ -8,8 +8,8 @@
 #endif
 #include <complex>
 #define WP 200
-//#define MPC_MP
-#define GMP_MP
+#define MPC_MP
+//#define GMP_MP
 //#define CPP_MP
 #ifdef CPP_MP
 #include <boost/multiprecision/cpp_bin_float.hpp> 

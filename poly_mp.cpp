@@ -7,8 +7,8 @@
 // N.B. you can use either CPP, GMP or MPC backend by
 // defining CPP_MP, GMP_MP or MPC_MP
 #define NDEG 20
-//#define MPC_MP
-#define GMP_MP
+#define MPC_MP
+//#define GMP_MP
 #ifdef CPP_MP
 #include <boost/multiprecision/cpp_bin_float.hpp> 
 #include <boost/multiprecision/cpp_complex.hpp>
