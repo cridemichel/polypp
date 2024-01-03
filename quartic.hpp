@@ -1510,6 +1510,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
    * the four roots will be stored in the complex array roots[] 
    *
    * */
+  const ntype Kfact = 2.0;
   cmplx acx1, bcx1, ccx1, dcx1,acx,bcx,cdiskr,zx1,zx2,zxmax,zxmin, ccx, dcx;
   cmplx l2m[12], d2m[12], bl311, dml3l3; 
   cmplx a,b,c,d,phi0,d2,d3,l1,l2,l3,acxv[3],ccxv[3],gamma,del2,qroots[2];
@@ -1657,7 +1658,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
       ccx = ccxv[kmin];
     }
   /* Case III: d2 is 0 or approximately 0 (in this case check which solution is better) */
-  if (abs(d2) <= meps*(abs(cmplx(2.)*b/cmplx(3.)) + abs(phi0) + abs(l1*l1))) 
+  if (abs(d2) <= Kfact*meps*(abs(cmplx(2.)*b/cmplx(3.)) + abs(phi0) + abs(l1*l1))) 
     {
       d3 = d - l3*l3;
       err0 = oqs_calc_err_abcd_ccmplx(a, b, c, d, acx, bcx, ccx, dcx);
