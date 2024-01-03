@@ -110,7 +110,7 @@ class quartic: public numeric_limits<ntype>, public quarticbase<ntype,cmplx, dyn
 	 pvector<cmplx, -1>>::type;
 
   const ntype pigr=acos(ntype(-1.0));
-  ntype eps05, meps, maxf, maxf2, maxf3, scalfact, cubic_rescal_fact;
+  ntype eps05, meps, maxf, maxf2, maxf3, scalfact, cubic_rescal_fact, Kfact;
   int maxdigits;
   ntype goaleps;
   const cmplx I = cmplx(0.0,1.0);
@@ -354,6 +354,7 @@ public:
     }
    void init_const(void)
     {
+      Kfact = 2.0;
       meps = epsilon();
       //cout << setprecision(50) << "meps=" << meps << "\n";
       eps05 = pow(numeric_limits<ntype>::epsilon(),0.5);
@@ -1384,7 +1385,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   else 
     realcase[0] = -1; // d2=0
   /* Case III: d2 is 0 or approximately 0 (in this case check which solution is better) */
-  if (realcase[0]==-1 || (abs(d2) <= meps*(abs(2.*b/3.) + abs(phi0) + l1*l1))) 
+  if (realcase[0]==-1 || (abs(d2) <= Kfact*meps*(abs(2.*b/3.) + abs(phi0) + l1*l1))) 
     {
       d3 = d - l3*l3;
       if (realcase[0]==1)
@@ -1510,7 +1511,6 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
    * the four roots will be stored in the complex array roots[] 
    *
    * */
-  const ntype Kfact = 2.0;
   cmplx acx1, bcx1, ccx1, dcx1,acx,bcx,cdiskr,zx1,zx2,zxmax,zxmin, ccx, dcx;
   cmplx l2m[12], d2m[12], bl311, dml3l3; 
   cmplx a,b,c,d,phi0,d2,d3,l1,l2,l3,acxv[3],ccxv[3],gamma,del2,qroots[2];
