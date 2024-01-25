@@ -111,6 +111,7 @@ class quartic: public numeric_limits<ntype>, public quarticbase<ntype,cmplx, dyn
 
   const ntype pigr=acos(ntype(-1.0));
   ntype eps05, meps, maxf, maxf2, maxf3, scalfact, cubic_rescal_fact;
+  bool check_always_d20;
   int maxdigits;
   ntype goaleps;
   const cmplx I = cmplx(0.0,1.0);
@@ -365,6 +366,12 @@ public:
     {
       return numeric_limits<ntype>::epsilon(); 
     }
+
+  void set_check_always_d20(bool b)
+    {
+      check_always_d20 = b;
+    }
+
   ntype getmax()
     {
       return numeric_limits<ntype>::max();
@@ -384,6 +391,7 @@ public:
       cubic_rescal_fact = pow(maxf, 1.0/3.0)/1.618034;
       goaleps=numeric_limits<ntype>::epsilon();   
       is_cmplx=-1;
+      check_always_d20 = true;
    }
 
    quartic() 
@@ -1419,7 +1427,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   // hence to consider d3 != 0 we require that
   // d3 > meps*min{abs(d2*d),abs(d2*d2*l2*l2),abs(l3*l3*d2)     
   
-  if (realcase[0]==-1 || abs(d2) <= meps*(abs(2.*b/3.) + abs(phi0) + l1*l1)
+  if (check_always_d20 || realcase[0]==-1 || abs(d2) <= meps*(abs(2.*b/3.) + abs(phi0) + l1*l1)
     || abs(detM) > meps*oqs_min3(abs(d2*d),abs(d2*d2*l2*l2),abs(l3*l3*d2) )) 
     {
       d3 = d - l3*l3;
@@ -1694,7 +1702,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
     }
   /* Case III: d2 is 0 or approximately 0 (in this case check which solution is better) */
 
-  if (abs(d2) <= meps*(abs(cmplx(2.)*b/cmplx(3.)) + abs(phi0) + abs(l1*l1)) 
+  if (check_always_d20 || abs(d2) <= meps*(abs(cmplx(2.)*b/cmplx(3.)) + abs(phi0) + abs(l1*l1)) 
       || abs(detM) > meps*oqs_min3(abs(d2*d),abs(d2*d2*l2*l2),abs(l3*l3*d2))) 
     {
       d3 = d - l3*l3;
