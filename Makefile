@@ -69,7 +69,7 @@ ifneq ($(HBDIR),)
 HBLIBS=-L $(HBDIR)/lib -lmpc -lmpfr -lgmp -lgmpxx
 HBHDRS=-I $(HBDIR)/include
 else
-HBLIBS=
+HBLIBS=-lmpc -lmpfr -lgmp -lgmpxx
 HBHDRS=
 endif
 # if PARALLEL is set to 1 parallelization through openmp is enabled,
