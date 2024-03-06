@@ -107,7 +107,7 @@ class quartic: public numeric_limits<ntype>, public quarticbase<ntype,cmplx, dyn
   using quarticbase<ntype,cmplx,dynamic>::cmonc;
   using quarticbase<ntype,cmplx,dynamic>::is_cmplx;
   using roots_vtype = typename std::conditional<(dynamic==false), pvector<cmplx, 4>,
-	 pvector<cmplx, -1>>::type;
+        pvector<cmplx, -1>>::type;
 
   const ntype pigr=acos(ntype(-1.0));
   ntype eps05, meps, maxf, maxf2, maxf3, scalfact, cubic_rescal_fact;
@@ -115,34 +115,36 @@ class quartic: public numeric_limits<ntype>, public quarticbase<ntype,cmplx, dyn
   int maxdigits;
   ntype goaleps;
   const cmplx I = cmplx(0.0,1.0);
+  ntype fact_d0;
+
   ntype oqs_max2(ntype a, ntype b)
     {
       if (a >= b)
-	return a;
+        return a;
       else
-	return b;
+        return b;
     }
 
-   ntype oqs_max3(ntype a, ntype b, ntype c)
+  ntype oqs_max3(ntype a, ntype b, ntype c)
     {
       ntype t;
       t = oqs_max2(a,b);
       return oqs_max2(t,c);
     }
 
-   ntype oqs_min2(ntype a, ntype b)
+  ntype oqs_min2(ntype a, ntype b)
     {
       if (a <= b)
-	return a;
+        return a;
       else
-	return b;
+        return b;
     }
 
-   ntype oqs_min3(ntype a, ntype b, ntype c)
-     {
-       ntype t;
-       t = oqs_min2(a,b);
-       return oqs_min2(t,c);
+  ntype oqs_min3(ntype a, ntype b, ntype c)
+    {
+      ntype t;
+      t = oqs_min2(a,b);
+      return oqs_min2(t,c);
     }
 
   inline void oqs_quartic_solver(roots_vtype& roots);
@@ -151,18 +153,19 @@ class quartic: public numeric_limits<ntype>, public quarticbase<ntype,cmplx, dyn
   inline void oqs_solve_cubic_analytic_depressed_handle_inf_cmplx(cmplx b, cmplx c, cmplx& sol);
   inline void oqs_solve_cubic_analytic_depressed(ntype b, ntype c, ntype& sol);
   inline void oqs_solve_cubic_analytic_depressed_cmplx(cmplx b, cmplx c, cmplx& sol);
-  inline ntype oqs_calc_phi0(ntype a, ntype b, ntype c, ntype d, ntype& phi0, int scaled);
-  inline cmplx oqs_calc_phi0_cmplx(cmplx a, cmplx b, cmplx c, cmplx d, cmplx& phi0, int scaled);
+  inline void oqs_calc_phi0(ntype a, ntype b, ntype c, ntype d, ntype& phi0, int scaled);
+  inline void oqs_calc_phi0_cmplx(cmplx a, cmplx b, cmplx c, cmplx d, cmplx& phi0, int scaled);
   inline ntype oqs_calc_err_ldlt(ntype b, ntype c, ntype d, ntype d2, ntype l1, ntype l2, ntype l3);
   inline ntype oqs_calc_err_abcd_cmplx(ntype a, ntype b, ntype c, ntype d, 
-	    			       cmplx aq, cmplx bq, cmplx cq, cmplx dq);
+                                       cmplx aq, cmplx bq, cmplx cq, cmplx dq);
+  inline ntype oqs_calc_err_d(ntype errmin, ntype d, ntype bq, ntype dq);
   inline ntype oqs_calc_err_abcd(ntype a, ntype b, ntype c, ntype d, ntype aq, ntype bq, ntype cq, ntype dq);
   inline ntype oqs_calc_err_abc(ntype a, ntype b, ntype c, ntype aq, ntype bq, ntype cq, ntype dq); 
   inline void NRabcdCCmplx(cmplx a, cmplx b, cmplx c, cmplx d, cmplx& AQ, cmplx& BQ, cmplx& CQ, cmplx& DQ);
   inline void oqs_NRabcd(ntype a, ntype b, ntype c, ntype d, ntype& AQ, ntype& BQ, ntype& CQ, ntype& DQ);
   inline void oqs_solve_quadratic(ntype a, ntype b, cmplx roots[2]);
   ntype oqs_calc_err_ldlt_cmplx(cmplx b, cmplx c, cmplx d, cmplx d2, 
-                                 cmplx l1, cmplx l2, cmplx l3)
+                                cmplx l1, cmplx l2, cmplx l3)
     {
       /* Eqs. (29) and (30) in the manuscript */
       ntype sum;
@@ -172,7 +175,7 @@ class quartic: public numeric_limits<ntype>, public quarticbase<ntype,cmplx, dyn
       return sum;
     }
   ntype oqs_calc_err_abc_cmplx(cmplx a, cmplx b, cmplx c, cmplx aq, 
-                              cmplx bq, cmplx cq, cmplx dq)
+                               cmplx bq, cmplx cq, cmplx dq)
     {
       /* Eqs. (48)-(51) in the manuscript */
       ntype sum;
@@ -181,6 +184,16 @@ class quartic: public numeric_limits<ntype>, public quarticbase<ntype,cmplx, dyn
       sum +=(a==cmplx(0))?abs(aq + cq):abs(((aq + cq) - a)/a);
       return sum;
     }
+ 
+  ntype oqs_calc_err_d_ccmplx(ntype errmin, cmplx d, cmplx bq, cmplx dq)
+    {
+      /* Eqs. (68) and (69) in the manuscript */
+      ntype sum;
+      sum = (d==cmplx(0))?abs(bq*dq):abs((bq*dq-d)/d);
+      sum += errmin;
+      return sum;
+    }
+  
   ntype oqs_calc_err_abcd_ccmplx(cmplx a, cmplx b, cmplx c, cmplx d, 
                                  cmplx aq, cmplx bq, cmplx cq, cmplx dq)
     {
@@ -222,6 +235,12 @@ class quartic: public numeric_limits<ntype>, public quarticbase<ntype,cmplx, dyn
 
 
 public:
+
+  void set_fact_d0(ntype K)
+    {
+      fact_d0 = K;
+    }
+
   void show(void)
     {
       show(NULL);
@@ -235,33 +254,33 @@ public:
     {
       int i;
       if (str!=NULL)
-	cout <<  str;
+        cout <<  str;
       for (i=n; i >= 0; i--)
-	{
-	  if (coeff[i] > 0)
-    	    {
-	      if (i < n)
-		cout << "+";
-	    }
-	  else
-	    { 
-	      cout << "-";
-	    }
-	  if (i==0)
-	    cout << setprecision(maxdigits) << abs(coeff[i]);
-	  else if (i > 0 && abs(coeff[i]) != 1.0)
-	    cout << setprecision(maxdigits) << abs(coeff[i])<< "*";
-	 
-	  if ( i > 1)
-	    {
-	      cout << "x^" << i;
-	    }
-	  else if (i==1)
-	    cout << "x";
-	}
+        {
+          if (coeff[i] > 0)
+            {
+              if (i < n)
+                cout << "+";
+            }
+          else
+            { 
+              cout << "-";
+            }
+          if (i==0)
+            cout << setprecision(maxdigits) << abs(coeff[i]);
+          else if (i > 0 && abs(coeff[i]) != 1.0)
+            cout << setprecision(maxdigits) << abs(coeff[i])<< "*";
+
+          if ( i > 1)
+            {
+              cout << "x^" << i;
+            }
+          else if (i==1)
+            cout << "x";
+        }
       cout << "\n";
     }
-   cmplx evalpoly(cmplx x)
+  cmplx evalpoly(cmplx x)
     {
       // evaluate polynomail via Horner's formula 
       cmplx bn=cmplx(0.0);
@@ -269,10 +288,10 @@ public:
         {
           bn = cmonc[i] + bn*x;
         }
-      
+
       return bn;
     }
-   cmplx evaldpoly(cmplx x)
+  cmplx evaldpoly(cmplx x)
     {
       // evaluate polynomail via Horner's formula 
       cmplx bn=0.0;
@@ -282,7 +301,7 @@ public:
         }
       return bn;
     }
-   ntype evalddpoly(cmplx x)
+  ntype evalddpoly(cmplx x)
     {
       // evaluate second derivative of polynomail via Horner's formula 
       ntype bn=0.0;
@@ -294,8 +313,8 @@ public:
         }
       return bn;
     }
-  
-   ntype evalpoly(ntype x)
+
+  ntype evalpoly(ntype x)
     {
       // evaluate polynomail via Horner's formula 
       if (is_cmplx)
@@ -311,7 +330,7 @@ public:
       return bn;
     }
 
-   ntype evaldpoly(ntype x)
+  ntype evaldpoly(ntype x)
     {
       // evaluate first derivative of polynomail via Horner's formula 
       ntype bn=0.0;
@@ -320,7 +339,7 @@ public:
           cout << "[evaldpoly] for a complex polynomial argument must be a complex number";
           return 0.0;
         }
-   
+
       for (int i=n-1; i >= 0; i--)
         {
           bn = (i+1)*cmon[i+1] + bn*x;
@@ -336,7 +355,7 @@ public:
           cout << "[evalddpoly] for a complex polynomial argument must be a complex number";
           return 0.0;
         }
-      
+
       if (n == 1)
         return 0;
       for (int i=n-2; i >= 0; i--)
@@ -376,7 +395,7 @@ public:
     {
       return numeric_limits<ntype>::max();
     }
-   void init_const(void)
+  void init_const(void)
     {
       meps = epsilon();
       // cout << setprecision(50) << "meps=" << meps << "\n";
@@ -391,10 +410,12 @@ public:
       cubic_rescal_fact = pow(maxf, 1.0/3.0)/1.618034;
       goaleps=numeric_limits<ntype>::epsilon();   
       is_cmplx=-1;
-      check_always_d20 = true;
-   }
+      check_always_d20 = false;
+      fact_d0 = eps05;
+      //cout << setprecision(16) << "fact_d0=" << fact_d0 << "\n";
+    }
 
-   quartic() 
+  quartic() 
     {
       init_const();
     }
@@ -709,7 +730,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx,dynam
       sol = A+B; /* this is always largest root even if A=B */
     }
 }
-template <class ntype, class cmplx, bool dynamic> cmplx quartic<ntype,cmplx, dynamic>::oqs_calc_phi0_cmplx(cmplx a, cmplx b, cmplx c, cmplx d, cmplx& phi0, int scaled)
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dynamic>::oqs_calc_phi0_cmplx(cmplx a, cmplx b, cmplx c, cmplx d, cmplx& phi0, int scaled)
 {
   /* find phi0 as the dominant root of the depressed and shifted cubic 
    * in eq. (79) (see also the discussion in sec. 2.2 of the manuscript) */
@@ -826,9 +847,8 @@ template <class ntype, class cmplx, bool dynamic> cmplx quartic<ntype,cmplx, dyn
         }
     }
   phi0 = x;
-  return f;
 }
-template <class ntype, class cmplx, bool dynamic> ntype quartic<ntype, cmplx, dynamic>::oqs_calc_phi0(ntype a, ntype b, ntype c, ntype d, ntype& phi0, int scaled)
+template <class ntype, class cmplx, bool dynamic> void quartic<ntype, cmplx, dynamic>::oqs_calc_phi0(ntype a, ntype b, ntype c, ntype d, ntype& phi0, int scaled)
 {
   /* find phi0 as the dominant root of the depressed and shifted cubic 
    * in eq. (64) (see also the discussion in sec. 2.2 of the manuscript) */
@@ -927,8 +947,6 @@ template <class ntype, class cmplx, bool dynamic> ntype quartic<ntype, cmplx, dy
     	}
     }
   phi0 = x;
-  // Note that f is det(M) as in Eq. (22) of my ACM 2020
-  return f;
 }
 template <class ntype, class cmplx, bool dynamic> ntype  quartic<ntype,cmplx, dynamic>::oqs_calc_err_ldlt(ntype b, ntype c, ntype d, ntype d2, ntype l1, ntype l2, ntype l3)
 {
@@ -958,6 +976,17 @@ ntype quartic<ntype, cmplx, dynamic>::oqs_calc_err_abcd_cmplx(ntype a, ntype b, 
   sum += (c==0)?abs(bq*cq + aq*dq):abs(((bq*cq + aq*dq) - c)/c);
   sum +=(b==0)?abs(bq + aq*cq + dq):abs(((bq + aq*cq + dq) - b)/b);
   sum +=(a==0)?abs(aq + cq):abs(((aq + cq) - a)/a);
+  return sum;
+}
+template <class ntype, class cmplx, bool dynamic> ntype quartic<ntype, cmplx, dynamic>::oqs_calc_err_d(ntype errmin, ntype d, ntype bq, ntype dq)
+{
+  /* Eq. (53) in the manuscript for real alpha1 (aq), beta1 (bq), alpha2 (cq) and beta2 (dq)*/
+  ntype sum;
+  if (d==0.0)
+    sum = abs(bq*dq);
+  else
+    sum = abs((bq*dq-d)/d);
+  sum += errmin;
   return sum;
 }
 template <class ntype, class cmplx, bool dynamic> ntype quartic<ntype, cmplx, dynamic>::oqs_calc_err_abcd(ntype a, ntype b, ntype c, ntype d, ntype aq, ntype bq, ntype cq, ntype dq)
@@ -1247,7 +1276,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
    * */
   cmplx acx1, bcx1, ccx1, dcx1,acx,bcx,ccx,dcx,cdiskr,zx1,zx2,zxmax,zxmin, qroots[2];
   ntype l2m[12], d2m[12], res[12], resmin, bl311, dml3l3, err0=0, err1=0, aq1, bq1, cq1, dq1; 
-  ntype a,b,c,d,phi0,aq,bq,cq,dq,d2,d3,l1,l2,l3, errmin, errv[3], aqv[3], cqv[3],gamma,del2, detM;
+  ntype a,b,c,d,phi0,aq,bq,cq,dq,d2,d3,l1,l2,l3, errmin, errv[3], aqv[3], cqv[3],gamma,del2;
   int realcase[2], whichcase, k1, k, kmin, nsol;
   ntype rfactsq, rfact=1.0;
 
@@ -1261,7 +1290,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   b=coeff[2]/coeff[4];
   c=coeff[1]/coeff[4];
   d=coeff[0]/coeff[4];
-  detM = oqs_calc_phi0(a,b,c,d,phi0,0);
+  oqs_calc_phi0(a,b,c,d,phi0,0);
   //cout << "phi0=" << phi0 << "\n";
   // simple polynomial rescaling
   if (isnan(phi0)||isinf(phi0))
@@ -1272,7 +1301,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
       b /= rfactsq;
       c /= rfactsq*rfact;
       d /= rfactsq*rfactsq;
-      detM = oqs_calc_phi0(a,b,c,d,phi0,1);
+      oqs_calc_phi0(a,b,c,d,phi0,1);
     }
   //cout << setprecision(50) << "phi0=" << phi0 << "\n";
   l1=a/ntype(2.0);          /* eq. (4) */                                        
@@ -1413,7 +1442,6 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
     realcase[0] = -1; // d2=0
   /* Case III: d2 is 0 or approximately 0 (in this case check which solution is better) */
   //cout << setprecision(50) << "F=" << abs(d2)/(abs(2.*b/3.) + abs(phi0) + l1*l1)/meps << "\n";
-  //cout << setprecision(50) << "d2=" << d2 << " detM=" << detM << " detM/d2=" << detM/d2 <<  "\n";
   //ntype minv = oqs_min3(abs(d2*d),abs(d2*d2*l2*l2),abs(l3*l3*d2));
 
   // CRITICAL FIX: 
@@ -1427,12 +1455,11 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   // hence to consider d3 != 0 we require that
   // d3 > meps*min{abs(d2*d),abs(d2*d2*l2*l2),abs(l3*l3*d2)     
   
-  if (check_always_d20 || realcase[0]==-1 || abs(d2) <= meps*(abs(2.*b/3.) + abs(phi0) + l1*l1)
-    || abs(detM) > meps*oqs_min3(abs(d2*d),abs(d2*d2*l2*l2),abs(l3*l3*d2) )) 
+  if (check_always_d20 || realcase[0]==-1 || abs(d2) <= fact_d0*(abs(ntype(2.)*b/ntype(3.)) + abs(phi0) + l1*l1))
     {
       d3 = d - l3*l3;
       if (realcase[0]==1)
-	err0 = oqs_calc_err_abcd(a, b, c, d, aq, bq, cq, dq);
+	err0 = oqs_calc_err_d(errmin, d, bq, dq);
       else if (realcase[0]==0)
 	err0 = oqs_calc_err_abcd_cmplx(a, b, c, d, acx, bcx, ccx, dcx);
       if (d3 <= 0)
@@ -1556,7 +1583,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
    * */
   cmplx acx1, bcx1, ccx1, dcx1,acx,bcx,cdiskr,zx1,zx2,zxmax,zxmin, ccx, dcx;
   cmplx l2m[12], d2m[12], bl311, dml3l3; 
-  cmplx a,b,c,d,phi0,d2,d3,l1,l2,l3,acxv[3],ccxv[3],gamma,del2,qroots[2], detM;
+  cmplx a,b,c,d,phi0,d2,d3,l1,l2,l3,acxv[3],ccxv[3],gamma,del2,qroots[2];
   ntype res[12], resmin, err0, err1;
   ntype errmin, errv[3];
   int k1, k, kmin, nsol;
@@ -1571,7 +1598,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
   b=coeffc[2]/coeffc[4];
   c=coeffc[1]/coeffc[4];
   d=coeffc[0]/coeffc[4];
-  detM=oqs_calc_phi0_cmplx(a,b,c,d,phi0,0);
+  oqs_calc_phi0_cmplx(a,b,c,d,phi0,0);
   // simple polynomial rescaling
   if (isnan(phi0.real())||isinf(phi0.real())||
       isnan(phi0.imag())||isinf(phi0.imag()))
@@ -1582,7 +1609,7 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
       b /= rfactsq;
       c /= rfactsq*rfact;
       d /= rfactsq*rfactsq;
-      detM=oqs_calc_phi0_cmplx(a,b,c,d,phi0, 1);
+      oqs_calc_phi0_cmplx(a,b,c,d,phi0, 1);
     }
 
   l1=a/cmplx(2);        /* eq. (16) */                                        
@@ -1702,11 +1729,10 @@ template <class ntype, class cmplx, bool dynamic> void quartic<ntype,cmplx, dyna
     }
   /* Case III: d2 is 0 or approximately 0 (in this case check which solution is better) */
 
-  if (check_always_d20 || abs(d2) <= meps*(abs(cmplx(2.)*b/cmplx(3.)) + abs(phi0) + abs(l1*l1)) 
-      || abs(detM) > meps*oqs_min3(abs(d2*d),abs(d2*d2*l2*l2),abs(l3*l3*d2))) 
+  if (check_always_d20 || abs(d2) <= fact_d0*(abs(cmplx(2.)*b/cmplx(3.)) + abs(phi0) + abs(l1*l1))) 
     {
       d3 = d - l3*l3;
-      err0 = oqs_calc_err_abcd_ccmplx(a, b, c, d, acx, bcx, ccx, dcx);
+      err0 = oqs_calc_err_d_ccmplx(errmin, d, bcx, dcx);
       acx1 = l1;  
       bcx1 = l3 + sqrt(-d3);
       ccx1 = l1;
