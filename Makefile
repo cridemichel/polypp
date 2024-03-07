@@ -78,7 +78,7 @@ ifeq ($(PARALLEL),)
 PARALLEL=0
 endif
 LIBS=$(HBLIBS) 
-CXXFLAGS= -Wall -std=c++17 -O3 
+CXXFLAGS= -Wall -Wno-pessimizing-move -std=c++17 -O3 
 CXXFLAGSMP=$(CXXFLAGS) $(HBHDRS)
 HEADERS=quartic.hpp pvector.hpp rpoly.hpp cpoly.hpp cpolyvp.hpp rpolyvp.hpp
 ifeq ($(PARALLEL),1)
