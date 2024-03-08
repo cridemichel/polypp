@@ -379,7 +379,7 @@ public:
                 cout << "+";
               if (imag(coeff[i])!=0)
                 cout << "(";
-              if (abs(real(coeff[i]))!=1.0 || imag(coeff[i])!=0)
+              if ( i==0 || abs(real(coeff[i]))!=1.0 || imag(coeff[i])!=0 )
                 {
                   cout << setprecision(maxdigits) << abs(real(coeff[i]));
                 }
