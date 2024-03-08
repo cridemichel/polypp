@@ -47,7 +47,7 @@
 #if defined(_OPENMP)
 #define USE_ROLD
 #endif
-/* NOTE: I have added a method to check whether roots are newton-isoalted, nevertheless it is not 
+/* NOTE: I have added a method to check whether roots are newton-isolated, nevertheless it is not 
  * more efficient to switch to a simple newton-raphson (NR) if a root is newton isolated since convergence
  * of NR is quadratic while that of Aberth method is cubic (I made also timing tests to verify this). */
 using namespace std;
