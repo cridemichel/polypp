@@ -14,6 +14,7 @@
 using namespace std;
 #define WP 1000
 #define WPO 50
+int wpout=WPO;
 #include <boost/multiprecision/mpc.hpp>
 #include <boost/multiprecision/mpfr.hpp>
 #include<chrono>
@@ -792,7 +793,7 @@ numty print_accuracy_at(char *str, cmplx csol[], cmplx exsol[], vldbl allrelerr[
     }
 
   //printf("[%s] relative accuracy=%.16LG\n", str, relerrmax);
-  cout << setprecision(WPO) << "[" << str << "relative accuracy=" <<  relerrmax << "]\n";
+  cout << setprecision(wpout) << "[" << str << "relative accuracy=" <<  relerrmax << "]\n";
   return relerrmax;
 }
 
@@ -802,10 +803,10 @@ void print_roots(char *str, cmplx er[], cmplx cr[], vldbl allrelerr[])
   for (auto i=0; i < NDEG; i++)
     {
 #if 0
-      cout << setprecision(WPO) << er[i] << "\n";
+      cout << setprecision(wpout) << er[i] << "\n";
 #else
-      cout << setprecision(WPO) << "root #" << i << " EX: "<< er[i] << " C:" << cr[i];
-      cout << setprecision(WPO) << " [ eps: " << allrelerr[i] << " ]\n"; 
+      cout << setprecision(wpout) << "root #" << i << " EX: "<< er[i] << " C:" << cr[i];
+      cout << setprecision(wpout) << " [ eps: " << allrelerr[i] << " ]\n"; 
 #endif
     }
 }
@@ -895,7 +896,7 @@ int main(int argc, char *argv[])
   char testo2[256];
   int i, CASO;
 
-  if (argc == 2)
+  if (argc >= 2)
     {
       CASO = atoi(argv[1]);
     }
@@ -927,8 +928,12 @@ int main(int argc, char *argv[])
     ca[i]=pdbl(c[i]);
   rpolyvp<pdbl,pcmplx> rp(NDEG);
 #endif
-  //rp.set_initial_precision(WPO+10); // if initial precision is not provided is automatically estimated
-  rp.set_output_precision(WPO);
+  //rp.set_initial_precision(wpout+10); // if initial precision is not provided is automatically estimated
+  if (argc==3)
+    wpout=atoi(argv[2]);
+
+  cout << "Setting output precision to " << wpout << "\n"; 
+  rp.set_output_precision(wpout);
 #if 0
   ca << vldbl("1000000000000000000008346962541009034453086.821697296219179045046664484901942729446473956048117740458953643474283644635648427289702690053362616897959318798131088532061302824628797564925448818221632219767823743930148192581238368450445770157185564480609867928657144253709133125312916217027452267645094110359105442920048520368367423677222738786320246884150013418829955593995865248232724169657996788692277236120476941464903712177328943231179820712168053492847463526530351288676696083990319434380668869649890291677456096520399136065564336307089427040150435183615062329416114050680007979867551225440163846881756836976164781428557814790849151391717448891603146750719324984029015532003519364330286182971748778594064103064576276958571593213051337206935747315307688037855195561369701223801781119110384151791246973809129219150278801650356317872437694655163232807467865667292396849279493678819575608949278180730505261869837032973519728281868552953767803628000425846014167231535754872088717413857920636083615136692"),
 vldbl("-1000000000000000019008346962541009034603332147435458839334.575498101477180491988326603702319474494594286598994465446231611759466739211376838159456027086193428063123887573503353178932203579504829346481776583961243673875510553027502834409998146026737727026929453267245741205452026295022386425313587460495493424991225468432920774243835325505410162715472073030753074232538557437520668677965711966346458742361539955894304631364814093067820882330139858396979575274469627554257048870442732825975056282145731992647692232253131728734161145993335648476544273770760048921879396890556784926390580450665305561722999909678728593282016134597286162653365077320934502373392570061999526285001732870683329605892492727995545071859498346171902128919499076121934924711018160923862645668497028262086788438093053731547581604832988861445661251442772906135358685721946126920112553755282918669620500547951362602132476151643117200129443503252430616991311395959070769236917343842158035472512728276159171509380294310390242425699673"),
@@ -956,12 +961,12 @@ vldbl("1");
   //rp.show("p(x)=");
   auto t1=std::chrono::high_resolution_clock::now();
   rp.find_roots(roots);
-  if (CASO==23)
-    rp.show("Polynomial:\n");
   auto t2=std::chrono::high_resolution_clock::now();
   std::cout << "finding roots took "
               << std::chrono::duration_cast<std::chrono::milliseconds>(t2-t1).count()
               << " milliseconds\n";
+  if (CASO==23)
+    rp.show("Polynomial:\n");
   sprintf(testo2, "OPS");
   for (i=0; i < NDEG; i++)
     cr[i] = cmplx(roots[i]);
@@ -979,12 +984,12 @@ vldbl("1");
       cout << "roots:\n";
       for (auto v: roots)
         {
-          cout << "#" << cc << ": " << setprecision(WPO) << real(v); 
+          cout << "#" << cc << ": " << setprecision(wpout) << real(v); 
           if (imag(v) < 0) 
             cout << " - ";
           else
             cout << " + ";
-          cout << setprecision(WPO) << abs(imag(v)) << "*I\n";
+          cout << setprecision(wpout) << abs(imag(v)) << "*I\n";
           cc++;   
         }
     }
