@@ -967,7 +967,7 @@ vldbl("1");
               << " milliseconds\n";
   if (CASO==23)
     rp.show("Polynomial:\n");
-  sprintf(testo2, "OPS");
+  snprintf(testo2, 256, "OPS");
   for (i=0; i < NDEG; i++)
     cr[i] = cmplx(roots[i]);
   // sort roots and calculate relative error
