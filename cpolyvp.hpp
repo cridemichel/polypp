@@ -260,6 +260,7 @@ public:
             }
         }
       //cout << setprecision(200) << "maxerr= " << maxerr << "\n";
+      //cout  << "nf=" << nf << " over " << n << "\n";
       if (nf == n)
         {
           for (j=0; j < n; j++)
