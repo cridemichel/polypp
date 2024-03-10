@@ -27,7 +27,7 @@ using pdbl=mpfr_float;
 using pcmplx=mpc_complex;
 //template <int N, int digits=200>
 //using rpolymp = rpoly<number<mpfr_float_backend<digits>>,N,false,number<mpc_complex_backend<digits>>>;
-#define Complex(x,y) cmplx("x","y"))
+#define Complex(x,y) cmplx("x","y")
 bool allreal=false, doswap=false;
 #undef M_PI
 #define M_PI 3.1415926535897932384626433832795029L
