@@ -958,6 +958,12 @@ vldbl("-19000.0000000000000010083469625410090344530544825829565525054931640625")
 vldbl("1");
 #endif
   rp.set_coeff(ca);
+#if 0
+  for (auto c: ca)
+    {
+      cout << setprecision(200) << c << "\n";
+    }
+#endif
   //rp.show("p(x)=");
   auto t1=std::chrono::high_resolution_clock::now();
   rp.find_roots(roots);
