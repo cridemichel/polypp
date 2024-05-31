@@ -23,7 +23,7 @@ In addition to header files you will find some .cpp files with examples on how t
 Multiprecision is implemented through boost multiprecision libraries (https://www.boost.org/doc/libs/1_73_0/libs/multiprecision/doc/html/index.html) and you need to have both boost and gmp (https://gmplib.org/) installed.
 Boost and gmp are conveniently provided by *boost* and *gmp* homebrew packages (https://brew.sh/). 
 Note that homebrew not only supports Mac OSX but also Linux and Windows (see https://docs.brew.sh/Homebrew-on-Linux).
-To build the sources you need a c++ compiler which complies with *c++17*. It is strongly recommended to install g++ from homebrew. The package is called gcc and it will provide the executable g++-13.
+To build the sources you need a c++ compiler which complies with *c++17*. It is strongly recommended to install g++ from homebrew. The package is called gcc and it will provide the g++ executable.
 
 The class itself can be used without boost and gmp and it does not require gcc from homebrew. 
 This means that the *poly_real* example can be straightforwardly compiled by the command:
